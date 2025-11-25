@@ -18,10 +18,10 @@ export default function Navbar() {
 
   const linkStyle = ({ isActive }) => ({
     padding: '8px 10px',
-    color: isActive ? 'var(--navbar-fg)' : 'var(--text-secondary)',
+    color: isActive ? 'var(--navbar-fg)' : 'var(--link)',
     textDecoration: 'none',
     borderRadius: 8,
-    background: isActive ? 'rgba(125,211,252,0.10)' : 'transparent',
+    background: isActive ? 'color-mix(in oklab, var(--link) 12%, transparent)' : 'transparent',
     transition: 'var(--transition-theme)',
   });
 

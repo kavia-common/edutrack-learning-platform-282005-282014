@@ -24,6 +24,11 @@ The LMS ships with a DigitalT3 theme supporting both Light and Dark modes.
   - A dedicated Light Mode palette is defined under `:root[data-theme="light"]`
 - All core components read from tokens: Button, Card, Modal, Badge, Navbar, Layout
 - Buttons (including primary, outline, ghost/link, view, continue) are unified under the brand primary color (#43919d). Global utility class `.btn` and the `Button` primitive both derive styles from button tokens (`--btn-*`).
+- Links, badges, and focus rings are standardized on the brand color #43919d using semantic tokens:
+  - Links: `--link`, `--link-hover`, `--link-visited`
+  - Focus: `--focus-ring`
+  - Badges: `--badge-primary-*`, `--badge-info-*`, `--badge-success-*`
+  Update these in `src/theme/tokens.css` for both default (dark) and `[data-theme="light"]`.
 
 ### Runtime behavior
 
@@ -44,6 +49,23 @@ getTheme();          // -> 'light' | 'dark'
 setTheme('light');   // set explicit theme and persist
 toggleTheme();       // toggles and persists
 ```
+
+### Brand-wide color usage
+
+- Where to change brand colors:
+  - src/theme/tokens.css
+    - --brand-primary, --brand-primary-hover, --brand-primary-active, --brand-primary-ring
+    - Link tokens: --link, --link-hover, --link-visited
+    - Focus token: --focus-ring
+    - Badge tokens: --badge-primary-bg/fg, --badge-info-bg/fg, --badge-success-bg/fg
+- Components consume tokens; avoid hardcoding colors in components (Navbar, RoleBadge, Badge).
+- Global styles (index.css) apply link styling and focus-visible outlines using these tokens.
+
+Accessibility
+- Ensure AA contrast for text on badges:
+  - On light theme, tinted backgrounds use dark teal text (e.g., #0b3a42) for brand/info; success uses #064e3b.
+  - On dark theme, tinted backgrounds use white text.
+- Focus rings use semi-transparent brand ring for visibility across backgrounds.
 
 ### Customization
 
