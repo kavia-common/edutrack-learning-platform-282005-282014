@@ -19,12 +19,10 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard.jsx'));
 const AdminLogin = React.lazy(() => import('./pages/AdminLogin.jsx'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard.jsx'));
 const Profile = React.lazy(() => import('./pages/Profile.jsx'));
-const AdminUsers = React.lazy(() => import('./pages/admin/AdminUsers.jsx'));
-const AdminDocuments = React.lazy(() => import('./pages/admin/AdminDocuments.jsx'));
-const AdminSettings = React.lazy(() => import('./pages/admin/AdminSettings.jsx'));
-const AdminDocumentView = React.lazy(() => import('./pages/admin/AdminDocumentView.jsx'));
 const AdminInbox = React.lazy(() => import('./pages/admin/AdminInbox.jsx'));
 const AdminInboxPreview = React.lazy(() => import('./pages/admin/AdminInboxPreview.jsx'));
+// Note: AdminUsers, AdminDocuments, AdminSettings, and AdminDocumentView are intentionally
+// not imported here to disable access from the Admin UI.
 
 
 const PREVIEW_ONLY = String(process.env.REACT_APP_PREVIEW_DOCUMENTS_ONLY || '').toLowerCase() === 'true';
@@ -443,38 +441,8 @@ function App() {
                             </AdminRouteGuard>
                           }
                         />
-                    <Route
-                      path="/admin/users"
-                      element={
-                        <AdminRouteGuard>
-                          <AdminUsers />
-                        </AdminRouteGuard>
-                      }
-                    />
-                    <Route
-                      path="/admin/documents"
-                      element={
-                        <AdminRouteGuard>
-                          <AdminDocuments />
-                        </AdminRouteGuard>
-                      }
-                    />
-                    <Route
-                      path="/admin/documents/:id"
-                      element={
-                        <AdminRouteGuard>
-                          <AdminDocumentView />
-                        </AdminRouteGuard>
-                      }
-                    />
-                    <Route
-                      path="/admin/settings"
-                      element={
-                        <AdminRouteGuard>
-                          <AdminSettings />
-                        </AdminRouteGuard>
-                      }
-                    />
+                    {/* Users, Documents, Document View, and Settings routes are intentionally disabled */}
+                    {/* Previously defined routes removed to prevent access and avoid unresolved component references */}
                     <Route
                       path="/admin/inbox"
                       element={

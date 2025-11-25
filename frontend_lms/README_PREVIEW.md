@@ -93,3 +93,4 @@ Transitions are controlled by `--transition-theme` for a minimal, smooth theme c
 
 - The Sidebar is currently decommissioned and returns null.
 - Environment variables are read via `src/utils/env.js` and logged on startup for validation.
+- Admin sections "Users", "Documents", and "Settings" are intentionally hidden/disabled from the Admin UI. Their components still exist in the codebase but are not linked nor routed from the Admin dashboard.

@@ -89,6 +89,8 @@ export default function Navbar() {
             <NavLink to="/" style={linkStyle} end>Dashboard</NavLink>
             <NavLink to="/documents" style={linkStyle}>Documents</NavLink>
             <NavLink to="/profile" style={linkStyle}>Profile</NavLink>
+            {/* Admin subsections (Users, Documents, Settings) are intentionally hidden from navigation.
+               A single Admin entry remains to reach the Admin Dashboard (Inbox). */}
             <NavLink to={isAdmin ? "/admin" : "/admin/login"} style={linkStyle}>Admin</NavLink>
           </div>
         </div>
