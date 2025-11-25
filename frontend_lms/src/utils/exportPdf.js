@@ -9,7 +9,7 @@
 //      const ref = useRef(null);
 //      <button onClick={() => exportElementToPdf(ref.current, 'my-export.pdf')}>Download PDF</button>
 //      // or by selector:
-//      <button onClick={() => exportSelectorToPdf('#content', 'my-export.pdf')}>Download PDF</button>
+ //      <button onClick={() => exportSelectorToPdf('#content', 'my-export.pdf')}>Download PDF</button>
 //
 /* eslint-disable no-console */
 

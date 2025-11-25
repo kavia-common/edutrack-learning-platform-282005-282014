@@ -574,21 +574,17 @@ export default function OnboardingForm() {
                 })();
                 const title = `Onboarding Form – ${(form.firstName || '').trim() || 'User'} – ${new Date().toLocaleDateString()}`;
 
+                let saved = null;
                 if (blob instanceof Blob) {
-                  const saved = submitDocument({ title, blob, type: 'onboarding', status: 'submitted', submittedBy: email });
-                  if (saved) {
-                    push?.({ type: 'success', message: 'Onboarding PDF submitted to Admin Inbox.' });
-                  } else {
-                    push?.({ type: 'error', message: 'Failed to submit to Admin Inbox.' });
-                  }
+                  saved = submitDocument({ title, blob, type: 'onboarding', status: 'submitted', submittedBy: email });
                 } else if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/pdf')) {
-                  const saved = submitDocument({ title, blob: dataUrl, type: 'onboarding', status: 'submitted', submittedBy: email });
-                  if (saved) {
-                    push?.({ type: 'success', message: 'Onboarding PDF (data URL) submitted to Admin Inbox.' });
-                  } else {
-                    push?.({ type: 'error', message: 'Failed to submit data URL to Admin Inbox.' });
-                  }
-                } else if (success) {
+                  saved = submitDocument({ title, blob: dataUrl, type: 'onboarding', status: 'submitted', submittedBy: email });
+                }
+
+                if (saved) {
+                  push?.({ type: 'success', message: 'Onboarding PDF submitted to Admin Inbox.' });
+                } else if (success && !saved) {
+                  // Consistent with Documents: export succeeded, but we didn't get a storable payload
                   push?.({ type: 'info', message: 'PDF downloaded but could not be attached to Admin Inbox.' });
                 } else {
                   push?.({ type: 'error', message: `PDF export failed${error ? ` (${error})` : ''}.` });

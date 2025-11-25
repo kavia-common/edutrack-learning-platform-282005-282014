@@ -1,5 +1,5 @@
 import React from 'react';
-import { exportElementToPdf, exportSelectorToPdf } from '../utils/exportPdf';
+import { exportElementToPdf } from '../utils/exportPdf';
 
 /**
  * PUBLIC_INTERFACE
@@ -10,12 +10,12 @@ import { exportElementToPdf, exportSelectorToPdf } from '../utils/exportPdf';
  *  - selector?: string (CSS selector)
  *  - filename?: string
  *  - label?: string
- *  - onExport?: (payload: { blob?: Blob, success: boolean }) => void
+ *  - onExport?: (payload: { blob?: Blob|null, dataUrl?: string|null, success: boolean, error?: string }) => void
  *
  * Usage:
  *   const ref = useRef(null);
  *   <div ref={ref}> ... </div>
- *   <ExportPdfButton targetRef={ref} filename="section.pdf" onExport={({blob}) => submit(blob)} />
+ *   <ExportPdfButton targetRef={ref} filename="section.pdf" onExport={({blob, dataUrl}) => submitToInbox(blob ?? dataUrl)} />
  *
  *   or by selector:
  *   <ExportPdfButton selector="#exportable" label="Download PDF" />
@@ -31,29 +31,17 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
 
     let outcome = { success: false, blob: null, dataUrl: null, error: '' };
     try {
-      if (targetRef?.current) {
-        outcome = await exportElementToPdf(targetRef.current, filename, {
+      const el = targetRef?.current || (selector ? document.querySelector(selector) : null);
+      if (el) {
+        outcome = await exportElementToPdf(el, filename, {
           returnBlob: true,
           returnDataUrl: true,
           skipSave: false,
           diagnostics: DIAG,
         });
-      } else if (selector) {
-        const el = document.querySelector(selector);
-        if (el) {
-          outcome = await exportElementToPdf(el, filename, {
-            returnBlob: true,
-            returnDataUrl: true,
-            skipSave: false,
-            diagnostics: DIAG,
-          });
-        } else {
-          log('Selector not found', selector);
-          outcome = { success: false, blob: null, dataUrl: null, error: 'selector-missing' };
-        }
       } else {
-        console.warn('[ExportPdfButton] Provide either targetRef or selector.');
-        outcome = { success: false, blob: null, dataUrl: null, error: 'no-target' };
+        log('No target element found for ExportPdfButton', { hasRef: !!targetRef?.current, selector });
+        outcome = { success: false, blob: null, dataUrl: null, error: selector ? 'selector-missing' : 'no-target' };
       }
     } catch (e) {
       log('Unhandled exception', e);
@@ -84,8 +72,7 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
       aria-label={label}
       title={label}
       style={{
-        // Derive from unified button tokens; keep width customizable via style prop
-        background: disabled ? 'var(--button-bg)' : 'var(--button-bg)',
+        background: 'var(--button-bg)',
         color: 'var(--button-text)',
         border: '1px solid var(--btn-border)',
         minWidth: 140,
