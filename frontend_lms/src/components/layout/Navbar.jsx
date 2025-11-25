@@ -8,8 +8,9 @@ import { getTheme, toggleTheme } from '../../theme';
  * Navbar with theme toggle (Light/Dark) and token-driven styles.
  */
 export default function Navbar() {
-  const { user, currentUserIsAdmin } = useAuth();
-  const isAdmin = Boolean(user?.role === 'admin' || currentUserIsAdmin === true);
+  const { user } = useAuth();
+  // Only show Admin for exact email match per requirement
+  const canSeeAdmin = user?.email === 'abburi@kavia.com';
   const [mode, setMode] = useState('light');
 
   useEffect(() => {
@@ -89,9 +90,10 @@ export default function Navbar() {
             <NavLink to="/" style={linkStyle} end>Dashboard</NavLink>
             <NavLink to="/documents" style={linkStyle}>Documents</NavLink>
             <NavLink to="/profile" style={linkStyle}>Profile</NavLink>
-            {/* Admin subsections (Users, Documents, Settings) are intentionally hidden from navigation.
-               A single Admin entry remains to reach the Admin Dashboard (Inbox). */}
-            <NavLink to={isAdmin ? "/admin" : "/admin/login"} style={linkStyle}>Admin</NavLink>
+            {/* Admin button visible only when logged-in user email is exactly abburi@kavia.com */}
+            {canSeeAdmin && (
+              <NavLink to="/admin" style={linkStyle}>Admin</NavLink>
+            )}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
