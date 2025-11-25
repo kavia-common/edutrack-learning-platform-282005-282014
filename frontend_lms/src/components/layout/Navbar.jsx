@@ -49,11 +49,43 @@ export default function Navbar() {
         maxWidth: 1280,
         margin: '0 auto'
       }}>
-        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <Link to="/" style={{ fontWeight: 800, color: 'var(--navbar-fg)', textDecoration: 'none' }}>
-            EduTrack LMS
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
+          <Link
+            to="/"
+            aria-label="EduTrack LMS Home"
+            style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', gap: 10 }}
+          >
+            <img
+              src="/assets/logo.png"
+              srcSet="/assets/20251125_131718_image.png 2x"
+              alt="EduTrack LMS Logo"
+              style={{
+                height: 28,
+                width: 'auto',
+                objectFit: 'contain',
+                display: 'block',
+                filter: 'var(--logo-filter, none)',
+              }}
+            />
+            <span
+              style={{
+                fontWeight: 800,
+                color: 'var(--navbar-fg)',
+                fontSize: 16,
+                whiteSpace: 'nowrap'
+              }}
+            >
+              EduTrack LMS
+            </span>
           </Link>
-          <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: 4,
+              marginLeft: 8,
+              flexWrap: 'wrap'
+            }}
+          >
             <NavLink to="/" style={linkStyle} end>Dashboard</NavLink>
             <NavLink to="/documents" style={linkStyle}>Documents</NavLink>
             <NavLink to="/profile" style={linkStyle}>Profile</NavLink>

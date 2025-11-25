@@ -2,6 +2,19 @@
 
 This preview shows the LMS UI and how to navigate. Use the sidebar and top navigation to access pages.
 
+## Logo
+
+- Current logo file(s):
+  - public/assets/20251125_131718_image.png (original, provided)
+  - public/assets/logo.png (alias used by Navbar)
+- The Navbar renders the logo on the left. It is responsive and theme-aware (inherits colors via CSS variables).
+- Favicon and Apple touch icon references are updated to use the same logo.
+
+To change the logo:
+1) Replace public/assets/logo.png with your image (keep the same filename for minimal code changes).
+2) Optionally also replace public/assets/20251125_131718_image.png if you want to keep the original copy aligned.
+3) If you want different sizes for PWA icons, you can also update references in public/index.html accordingly.
+
 ## DigitalT3 Theme: Light/Dark Mode
 
 The LMS ships with a DigitalT3 theme supporting both Light and Dark modes.
