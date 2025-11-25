@@ -97,6 +97,29 @@ a { color: var(--dt3-link); }
 a:hover { color: #AFE1FF; }
 a:focus-visible { outline: 3px solid rgba(34,211,238,.5); outline-offset: 2px; }
 
+/* Navbar logo sizing - responsive and crisp on HDPI */
+/* Keep width auto to preserve aspect ratio; use max-height to control visual size */
+.nav-logo {
+  max-height: 38px; /* slightly larger than previous ~28px; target range 36-40px */
+  height: auto;
+  width: auto;
+  image-rendering: -webkit-optimize-contrast; /* hint for crisper rendering on some browsers */
+  image-rendering: crisp-edges;               /* safe fallback */
+  vertical-align: middle;
+}
+
+/* Ensure no theme filter modifies image brightness in dark/light modes */
+:root {
+  --logo-filter: none;
+}
+
+/* Slightly reduce logo size on smaller screens to keep navbar balance */
+@media (max-width: 640px) {
+  .nav-logo {
+    max-height: 34px;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .theme-toggle {

@@ -56,15 +56,15 @@ export default function Navbar() {
             style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', gap: 10 }}
           >
             <img
+              className="nav-logo"
               src="/assets/logo.png"
               srcSet="/assets/20251125_131718_image.png 2x"
               alt="EduTrack LMS Logo"
               style={{
-                height: 28,
                 width: 'auto',
                 objectFit: 'contain',
-                display: 'block',
-                filter: 'var(--logo-filter, none)',
+                display: 'block'
+                // Intentionally avoid filters so dark/light mode doesn't affect image brightness
               }}
             />
             <span
