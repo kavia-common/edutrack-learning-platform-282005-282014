@@ -9,6 +9,9 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+* { box-sizing: border-box; }
+button, a { transition: background-color .15s ease, color .15s ease, box-shadow .15s ease, transform .15s ease; }
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;

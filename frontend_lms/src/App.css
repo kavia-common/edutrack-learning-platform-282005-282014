@@ -94,6 +94,21 @@
   outline-offset: 2px;
 }
 
+/* Animations */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Reset class for primitive buttons to avoid default browser styles */
+.btn-reset {
+  border: none;
+  background: none;
+}
+
 /* Links inherit accessible colors */
 a { color: var(--primary); }
 a:focus-visible { outline: 3px solid rgba(37,99,235,.5); outline-offset: 2px; }

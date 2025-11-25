@@ -243,9 +243,15 @@ export default function Documents() {
   const [state] = useState(() => loadAckState());
   const [submitStatus, setSubmitStatus] = useState('idle'); // idle | saving | saved
   const [docStatus, setDocStatus] = useState(() => getDocumentsStatus());
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const onFocus = () => setDocStatus(getDocumentsStatus());
+    const onFocus = () => {
+      setLoading(true);
+      const next = getDocumentsStatus();
+      setDocStatus(next);
+      setTimeout(() => setLoading(false), 180); // small delay for skeleton smoothness
+    };
     onFocus();
     if (typeof window !== 'undefined') {
       window.addEventListener('focus', onFocus);
@@ -406,10 +412,19 @@ export default function Documents() {
               }}
             />
             <div style={{ padding: 12 }}>
-              <h1 style={{ margin: 0, color: '#111827', fontSize: 20 }}>Onboarding Documents</h1>
-              <p style={{ marginTop: 6, marginBottom: 0, color: '#6b7280', lineHeight: 1.4 }}>
-                Read and acknowledge all required documents. Continue is enabled once Code of Conduct, NDA, and the Internship Letter are signed.
-              </p>
+              {loading ? (
+                <>
+                  <div style={{ width: '60%', height: 24, borderRadius: 8, background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%)', backgroundSize: '400% 100%', animation: 'skeleton-loading 1.4s ease infinite' }} />
+                  <div style={{ marginTop: 8, width: '90%', height: 14, borderRadius: 6, background: 'linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 37%, #e5e7eb 63%)', backgroundSize: '400% 100%', animation: 'skeleton-loading 1.4s ease infinite' }} />
+                </>
+              ) : (
+                <>
+                  <h1 style={{ margin: 0, color: '#111827', fontSize: 20 }}>Onboarding Documents</h1>
+                  <p style={{ marginTop: 6, marginBottom: 0, color: '#6b7280', lineHeight: 1.4 }}>
+                    Read and acknowledge all required documents. Continue is enabled once Code of Conduct, NDA, and the Internship Letter are signed.
+                  </p>
+                </>
+              )}
             </div>
           </div>
 

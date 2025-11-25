@@ -1,29 +1,30 @@
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
-import Documents from './routes/Documents';
 import { useAuth } from './store/authStore';
 import { FeatureFlagsProvider } from './store/featureFlags';
 import { ToastProvider, useToast } from './components/ui/Toast';
 import { AuthProvider } from './store/authStore';
 import { CoursesProvider } from './store/courseStore';
 import { ProgressProvider } from './store/progressStore';
-import CodeOfConduct from './pages/CodeOfConduct.jsx';
-import NDAAgreement from './pages/NDAAgreement.jsx';
-import OfferLetter from './pages/OfferLetter.jsx';
-import Navbar from './components/layout/Navbar.jsx';
-import Dashboard from './pages/Dashboard.jsx';
-import AdminLogin from './pages/AdminLogin.jsx';
-import AdminDashboard from './pages/AdminDashboard.jsx';
-import Profile from './pages/Profile.jsx';
+import Layout from './components/layout/Layout.jsx';
+import { applyCssVars } from './theme';
+import Skeleton from './components/ui/primitives/Skeleton.jsx';
 
-// Newly added admin pages
-import AdminUsers from './pages/admin/AdminUsers.jsx';
-import AdminDocuments from './pages/admin/AdminDocuments.jsx';
-import AdminSettings from './pages/admin/AdminSettings.jsx';
-import AdminDocumentView from './pages/admin/AdminDocumentView.jsx';
-import AdminInbox from './pages/admin/AdminInbox.jsx';
-import AdminInboxPreview from './pages/admin/AdminInboxPreview.jsx';
+const Documents = React.lazy(() => import('./routes/Documents'));
+const CodeOfConduct = React.lazy(() => import('./pages/CodeOfConduct.jsx'));
+const NDAAgreement = React.lazy(() => import('./pages/NDAAgreement.jsx'));
+const OfferLetter = React.lazy(() => import('./pages/OfferLetter.jsx'));
+const Dashboard = React.lazy(() => import('./pages/Dashboard.jsx'));
+const AdminLogin = React.lazy(() => import('./pages/AdminLogin.jsx'));
+const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard.jsx'));
+const Profile = React.lazy(() => import('./pages/Profile.jsx'));
+const AdminUsers = React.lazy(() => import('./pages/admin/AdminUsers.jsx'));
+const AdminDocuments = React.lazy(() => import('./pages/admin/AdminDocuments.jsx'));
+const AdminSettings = React.lazy(() => import('./pages/admin/AdminSettings.jsx'));
+const AdminDocumentView = React.lazy(() => import('./pages/admin/AdminDocumentView.jsx'));
+const AdminInbox = React.lazy(() => import('./pages/admin/AdminInbox.jsx'));
+const AdminInboxPreview = React.lazy(() => import('./pages/admin/AdminInboxPreview.jsx'));
 
 
 const PREVIEW_ONLY = String(process.env.REACT_APP_PREVIEW_DOCUMENTS_ONLY || '').toLowerCase() === 'true';
@@ -338,6 +339,8 @@ function App() {
   const [theme, setTheme] = useState('light');
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    // apply Ocean Professional css vars on mount and when toggled
+    try { applyCssVars(); } catch {}
   }, [theme]);
 
   // Banner for preview-only mode
@@ -408,32 +411,38 @@ function App() {
             <ProgressProvider>
               <div className="App" style={{ textAlign: 'initial' }}>
                 <Router>
-                  <Navbar />
-                  <NavigationBridge />
-                  {previewBanner}
-                  {mockBanner}
-                  <button
-                    className="theme-toggle"
-                    onClick={() => setTheme(t => (t === 'light' ? 'dark' : 'light'))}
-                    aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-                  >
-                    {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-                  </button>
-                  <Routes>
-                    <Route path="/" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <Dashboard />} />
-                    <Route path="/documents" element={<Documents />} />
-                    <Route path="/code-of-conduct" element={<CodeOfConduct />} />
-                    <Route path="/nda" element={<NDAAgreement />} />
-                    <Route path="/offer-letter" element={<OfferLetter />} />
-                    <Route path="/admin/login" element={<AdminLogin />} />
-                    <Route
-                      path="/admin"
-                      element={
-                        <AdminRouteGuard>
-                          <AdminDashboard />
-                        </AdminRouteGuard>
-                      }
-                    />
+                  <Layout>
+                    <NavigationBridge />
+                    {previewBanner}
+                    {mockBanner}
+                    <button
+                      className="theme-toggle"
+                      onClick={() => setTheme(t => (t === 'light' ? 'dark' : 'light'))}
+                      aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                    >
+                      {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+                    </button>
+                    <Suspense fallback={<div style={{ padding: 20, display: 'grid', gap: 12 }}>
+                      <Skeleton width="40%" height={28} />
+                      <Skeleton height={16} />
+                      <Skeleton height={16} />
+                      <Skeleton width="80%" height={16} />
+                    </div>}>
+                      <Routes>
+                        <Route path="/" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <Dashboard />} />
+                        <Route path="/documents" element={<Documents />} />
+                        <Route path="/code-of-conduct" element={<CodeOfConduct />} />
+                        <Route path="/nda" element={<NDAAgreement />} />
+                        <Route path="/offer-letter" element={<OfferLetter />} />
+                        <Route path="/admin/login" element={<AdminLogin />} />
+                        <Route
+                          path="/admin"
+                          element={
+                            <AdminRouteGuard>
+                              <AdminDashboard />
+                            </AdminRouteGuard>
+                          }
+                        />
                     <Route
                       path="/admin/users"
                       element={
@@ -458,7 +467,6 @@ function App() {
                         </AdminRouteGuard>
                       }
                     />
-
                     <Route
                       path="/admin/settings"
                       element={
@@ -479,16 +487,11 @@ function App() {
                       path="/admin/inbox/preview/:id/:doc"
                       element={
                         <AdminRouteGuard>
-                          {/* Full in-app PDF preview for Admin Inbox items.
-                              Important: This route is used instead of window.open or target=_blank
-                              to avoid Chrome extensions blocking popups (ERR_BLOCKED_BY_CLIENT). */}
                           <AdminInboxPreview />
                         </AdminRouteGuard>
                       }
                     />
-
                     <Route path="/onboarding" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <OnboardingWizard />} />
-
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/login" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <Login />} />
                     <Route path="/register" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <Register />} />
@@ -497,6 +500,8 @@ function App() {
                       element={<Navigate to={PREVIEW_ONLY ? '/documents' : '/'} replace />}
                     />
                   </Routes>
+                    </Suspense>
+                  </Layout>
                 </Router>
               </div>
             </ProgressProvider>

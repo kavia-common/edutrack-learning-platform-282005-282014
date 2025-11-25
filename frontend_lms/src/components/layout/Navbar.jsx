@@ -29,6 +29,7 @@ export default function Navbar() {
       background: 'var(--bg-secondary)',
       borderBottom: '1px solid var(--border-color)',
       boxShadow: '0 1px 0 rgba(0,0,0,0.03)',
+      backdropFilter: 'saturate(120%) blur(6px)'
     }}>
       <nav aria-label="Main navigation" style={{
         display: 'flex',
