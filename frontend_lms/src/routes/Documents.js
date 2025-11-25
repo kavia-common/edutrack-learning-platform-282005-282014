@@ -475,13 +475,11 @@ export default function Documents() {
             onClick={handleSubmit}
             className="btn"
             style={{
-              background: canContinue ? 'var(--primary)' : '#93C5FD',
-              color: '#fff',
               borderRadius: 10,
               padding: '8px 12px',
               minWidth: 128,
-              cursor: canContinue ? 'pointer' : 'not-allowed',
-              boxShadow: canContinue ? '0 6px 18px rgba(37,99,235,0.25)' : 'none',
+              opacity: !canContinue || submitStatus === 'saving' ? 0.6 : 1,
+              cursor: !canContinue || submitStatus === 'saving' ? 'not-allowed' : 'pointer'
             }}
             aria-disabled={!canContinue || submitStatus === 'saving'}
             aria-label="Continue after acknowledging documents"
