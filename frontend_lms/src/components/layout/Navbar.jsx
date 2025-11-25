@@ -89,6 +89,7 @@ export default function Navbar() {
           >
             <NavLink to="/" style={linkStyle} end>Dashboard</NavLink>
             <NavLink to="/documents" style={linkStyle}>Documents</NavLink>
+            <NavLink to="/onboarding-form" style={linkStyle}>Onboarding Form</NavLink>
             <NavLink to="/profile" style={linkStyle}>Profile</NavLink>
             {/* Admin button visible only when logged-in user email is exactly abburi@kavia.com */}
             {canSeeAdmin && (

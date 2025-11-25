@@ -16,6 +16,7 @@ const CodeOfConduct = React.lazy(() => import('./pages/CodeOfConduct.jsx'));
 const NDAAgreement = React.lazy(() => import('./pages/NDAAgreement.jsx'));
 const OfferLetter = React.lazy(() => import('./pages/OfferLetter.jsx'));
 const Dashboard = React.lazy(() => import('./pages/Dashboard.jsx'));
+const OnboardingForm = React.lazy(() => import('./pages/OnboardingForm.jsx'));
 const AdminLogin = React.lazy(() => import('./pages/AdminLogin.jsx'));
 const AdminDashboard = React.lazy(() => import('./pages/AdminDashboard.jsx'));
 const Profile = React.lazy(() => import('./pages/Profile.jsx'));
@@ -460,6 +461,7 @@ function App() {
                       }
                     />
                     <Route path="/onboarding" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <OnboardingWizard />} />
+                    <Route path="/onboarding-form" element={<OnboardingForm />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/login" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <Login />} />
                     <Route path="/register" element={PREVIEW_ONLY ? <Navigate to="/documents" replace /> : <Register />} />

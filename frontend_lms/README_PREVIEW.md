@@ -15,6 +15,23 @@ To change the logo:
 2) Optionally also replace public/assets/20251125_131718_image.png if you want to keep the original copy aligned.
 3) If you want different sizes for PWA icons, you can also update references in public/index.html accordingly.
 
+## Onboarding Form (New)
+
+- Route: /onboarding-form
+- Navigation: Navbar > Onboarding Form
+- Location: src/pages/OnboardingForm.jsx
+- Behavior:
+  - Basic validation on key fields (First/Last name, Phone, Email, DOB, Sex, Emergency Contact Name/Phone, Account Number).
+  - Required fields are marked with an asterisk (*).
+  - Responsive grid layout; works for mobile and desktop, light/dark compatible using theme tokens.
+  - On submit, data is not sent to any backend. A modal opens with a JSON preview and the data is logged to console.
+
+To modify fields:
+- Edit the component in src/pages/OnboardingForm.jsx
+- Update the initialState object for defaults or add/remove fields.
+- Add custom validation in the validators map and/or required map.
+- Adjust layout by changing gridColumn spans in the JSX.
+
 ## DigitalT3 Theme: Light/Dark Mode
 
 The LMS ships with a DigitalT3 theme supporting both Light and Dark modes.
