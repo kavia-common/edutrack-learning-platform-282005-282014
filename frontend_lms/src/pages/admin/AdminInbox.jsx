@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AdminGate from '../../components/AdminGate.jsx';
 import { getInboxItems, subscribe } from '../../utils/adminInbox';
-import { listInbox as listOnboardingDocs, subscribeInbox as subscribeOnboardingDocs } from '../../services/inbox';
+import { listInbox as listOnboardingDocs, subscribeInbox as subscribeOnboardingDocs, ensurePrintableHtml, updateStatus as updateOnboardingStatus } from '../../services/inbox';
 import { isPdfDataUrl, normalizePdfInput, base64PdfToBlobUrl } from '../../utils/pdfUtils';
 
 // Ocean Professional palette
@@ -494,20 +494,74 @@ export default function AdminInbox() {
                 {onboardingRows.length === 0 ? (
                   <tr><td colSpan={5} style={{ padding: 12, color: '#6b7280' }}>No onboarding form submissions.</td></tr>
                 ) : onboardingRows.map((d) => {
-                  const canView = !!d.url;
+                  const hasPdf = !!d.url;
+                  const canView = hasPdf || !!d.printableHtml || !!d.jsonPayload;
+                  const onViewClick = async () => {
+                    if (hasPdf) {
+                      handleView(d.url, d.title);
+                      return;
+                    }
+                    // Generate or use printable HTML for JSON-only entries
+                    try {
+                      let item = d;
+                      if (!item.printableHtml && typeof ensurePrintableHtml === 'function') {
+                        item = ensurePrintableHtml(d.id) || d;
+                      }
+                      const html = item.printableHtml;
+                      if (html) {
+                        // Open inline in same tab context using a Blob URL, then use viewer
+                        const blob = new Blob([html], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        // Use iframe viewer with blob URL – browsers render HTML; provide download via toolbar
+                        setViewerSrc(url);
+                        setViewerTitle(d.title || 'Onboarding Submission');
+                        setViewerOpen(true);
+                        // Revoke later on close via InlinePdfViewer cleanup pattern
+                      } else {
+                        // Fallback: show JSON in a simple window for quick view
+                        alert('No PDF available. JSON payload:\n\n' + JSON.stringify(item.jsonPayload || {}, null, 2));
+                      }
+                    } catch {
+                      alert('Unable to open submission. Please try again.');
+                    }
+                  };
+                  const onStatusChange = (e) => {
+                    const next = e.target.value;
+                    try {
+                      updateOnboardingStatus(d.id, next);
+                    } catch {
+                      // ignore
+                    }
+                  };
                   return (
                     <tr key={d.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
                       <td style={{ padding: 8 }}>{d.title}</td>
                       <td style={{ padding: 8 }}>{d.submittedBy || 'anonymous'}</td>
                       <td style={{ padding: 8 }}>{new Date(d.createdAt).toLocaleString()}</td>
                       <td style={{ padding: 8 }}>
-                        <span style={{ background: '#ecfeff', color: '#0e7490', padding: '2px 8px', borderRadius: 999 }}>{d.status || 'submitted'}</span>
+                        <select
+                          value={(d.status || 'submitted').toLowerCase().replace(' ', '_')}
+                          onChange={onStatusChange}
+                          aria-label={`Change status for ${d.title}`}
+                          style={{
+                            background: '#ecfeff',
+                            color: '#0e7490',
+                            padding: '6px 10px',
+                            borderRadius: 999,
+                            border: '1px solid #bae6fd',
+                          }}
+                        >
+                          <option value="submitted">Submitted</option>
+                          <option value="in_review">In Review</option>
+                          <option value="approved">Approved</option>
+                          <option value="rejected">Rejected</option>
+                        </select>
                       </td>
                       <td style={{ padding: 8 }}>
-                        <div style={{ display: 'inline-flex', gap: 8 }}>
+                        <div style={{ display: 'inline-flex', gap: 8, flexWrap: 'wrap' }}>
                           <button
                             type="button"
-                            onClick={() => canView ? handleView(d.url, d.title) : null}
+                            onClick={onViewClick}
                             disabled={!canView}
                             style={{
                               background: ocean.primary,
@@ -519,24 +573,43 @@ export default function AdminInbox() {
                               opacity: canView ? 1 : 0.5,
                             }}
                             aria-label={`View ${d.title}`}
-                            title={canView ? `View ${d.title}` : 'No PDF available'}
+                            title={canView ? `View ${d.title}` : 'No data available'}
                           >
                             View
                           </button>
-                          <a
-                            href={canView ? d.url : undefined}
-                            download={(d.title || 'Onboarding').replace(/\s+/g, '_') + '.pdf'}
-                            style={{
-                              color: canView ? ocean.primary : '#9ca3af',
-                              border: '1px solid #c7d2fe',
-                              padding: '6px 10px',
-                              borderRadius: 8,
-                              textDecoration: 'none',
-                              pointerEvents: canView ? 'auto' : 'none',
-                            }}
-                          >
-                            Download
-                          </a>
+                          {hasPdf ? (
+                            <a
+                              href={d.url}
+                              download={(d.title || 'Onboarding').replace(/\s+/g, '_') + '.pdf'}
+                              style={{
+                                color: ocean.primary,
+                                border: '1px solid #c7d2fe',
+                                padding: '6px 10px',
+                                borderRadius: 8,
+                                textDecoration: 'none',
+                              }}
+                            >
+                              Download
+                            </a>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={onViewClick}
+                              style={{
+                                background: 'transparent',
+                                color: ocean.secondary,
+                                border: '1px solid #fcd34d',
+                                padding: '6px 10px',
+                                borderRadius: 8,
+                                cursor: canView ? 'pointer' : 'not-allowed',
+                                opacity: canView ? 1 : 0.5,
+                              }}
+                              title="Open printable view (HTML)"
+                              aria-label="Open printable view"
+                            >
+                              Open Printable
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>

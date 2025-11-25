@@ -27,17 +27,23 @@ To change the logo:
   - On submit, data is not sent to any backend. A modal opens with a JSON preview and the data is logged to console.
 - Export PDF also submits the generated PDF to a client-side Admin Inbox, making it viewable under Admin > Inbox.
 
-### Onboarding PDF Submission Flow
+### Onboarding Submission Flow (PDF or JSON-only)
 
-- Trigger: The Export PDF button on the Onboarding Form.
-- After generating the PDF, the app requests a Blob from the export utility and stores it via a local inbox service:
+- Trigger 1: Submit button on the Onboarding Form.
+  - On successful validation, the form data is stored locally as a JSON-only Inbox item.
   - Service: src/services/inbox.js (localStorage key: ONBOARDING_DOCS)
-  - Schema: { id, title, createdAt, submittedBy, type: 'onboarding', url, status: 'submitted' }
+  - Schema: { id, title, createdAt, submittedBy, type: 'onboarding', status, jsonPayload, printableHtml? }
+  - The service auto-generates a simple printable HTML view if no PDF exists.
+- Trigger 2: Export PDF button on the Onboarding Form.
+  - After generating the PDF, the app requests a Blob/Data URL and stores it via the same Inbox service with a `url` field.
+  - Schema (PDF): { id, title, createdAt, submittedBy, type: 'onboarding', url, status }
 - Admin view:
-  - Admin Inbox (src/pages/admin/AdminInbox.jsx) shows a new table "Onboarding Form Submissions" with View and Download options.
-  - View opens an inline PDF iframe using the stored Blob/Data URL.
+  - Admin Inbox (src/pages/admin/AdminInbox.jsx) shows a table "Onboarding Form Submissions" with View/Download and a Status control.
+  - If a PDF is present, View opens an inline PDF iframe.
+  - If no PDF, View opens a printable HTML viewer derived from the saved JSON.
+  - Status options: Submitted, In Review, Approved, Rejected. Changes persist to localStorage.
 - Utilities:
-  - src/utils/exportPdf.js supports returning a Blob (options: { returnBlob: true, skipSave: true }) to avoid duplicate downloads.
+  - src/utils/exportPdf.js supports returning a Blob/Data URL (options: { returnBlob: true, returnDataUrl: true, skipSave: false }).
 
 Backend later:
 - Replace src/services/inbox.js with an API-backed module that posts the PDF (Blob or base64) and metadata to your backend.

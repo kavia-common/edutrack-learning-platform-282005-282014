@@ -110,6 +110,34 @@ export default function OnboardingForm() {
     } catch {
       // no-op
     }
+    // persist JSON entry into Admin Inbox (local service)
+    try {
+      const email = (() => {
+        try {
+          const raw = window.localStorage.getItem('lms_auth');
+          const session = raw ? JSON.parse(raw) : null;
+          return session?.user?.email || form?.email || 'anonymous';
+        } catch {
+          return form?.email || 'anonymous';
+        }
+      })();
+      const title = `Onboarding Submission – ${(form.firstName || '').trim() || 'User'} – ${new Date().toLocaleDateString()}`;
+      // Use submitJson from inbox service to store JSON-only entry
+      // Import is already present for submitDocument; we lazy import submitJson to keep tree-shaking safe.
+      import('../services/inbox').then((mod) => {
+        const submitJson = mod?.submitJson;
+        if (typeof submitJson === 'function') {
+          const saved = submitJson({ title, payload: form, type: 'onboarding', status: 'submitted', submittedBy: email });
+          if (saved) {
+            push?.({ type: 'success', message: 'Onboarding details submitted to Admin Inbox.' });
+          } else {
+            push?.({ type: 'error', message: 'Failed to save onboarding details to Inbox.' });
+          }
+        }
+      }).catch(() => {});
+    } catch {
+      // ignore
+    }
     setOpenModal(true);
   };
 
