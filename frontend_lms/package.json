@@ -1,16 +1,22 @@
 {
-  "name": "react-kavia",
+  "name": "onbording-lms-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "autoprefixer": "^10.4.22",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^2.5.1",
+    "postcss": "^8.5.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-router-dom": "^6.30.2",
     "react-scripts": "^5.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "PORT=${REACT_APP_PORT:-3000} cross-env BROWSER=none react-scripts start",
+    "preview": "PORT=${REACT_APP_PORT:-3000} cross-env BROWSER=none react-scripts start",
+    "build": "cross-env GENERATE_SOURCEMAP=${REACT_APP_ENABLE_SOURCE_MAPS:-false} react-scripts build",
+    "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -29,6 +35,7 @@
     ]
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "html-webpack-plugin": "^5.6.5"
   }
 }
