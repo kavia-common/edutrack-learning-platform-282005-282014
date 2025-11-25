@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 // PUBLIC_INTERFACE
 export default function Modal({ open, onClose, title = 'Dialog', children }) {
-  /** Accessible modal with focus trapping light (esc to close) */
+  /** Accessible modal with Escape to close */
   useEffect(() => {
     if (!open) return;
     const onKey = (e) => {
@@ -21,11 +21,12 @@ export default function Modal({ open, onClose, title = 'Dialog', children }) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(10,14,23,0.7)',
+        background: 'var(--modal-backdrop)',
         display: 'grid',
         placeItems: 'center',
         zIndex: 100,
         padding: 16,
+        transition: 'var(--transition-theme)'
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose?.();
@@ -33,19 +34,20 @@ export default function Modal({ open, onClose, title = 'Dialog', children }) {
     >
       <div
         style={{
-          background: 'var(--surface)',
-          backgroundImage: 'var(--dt3-grad-card)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 18,
+          background: 'var(--modal-bg)',
+          color: 'var(--modal-fg)',
+          border: '1px solid var(--color-border)',
+          borderRadius: 12,
           width: 'min(640px, 96vw)',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)',
-          overflow: 'hidden'
+          boxShadow: 'var(--shadow-lg)',
+          overflow: 'hidden',
+          transition: 'var(--transition-theme)'
         }}
       >
-        <header style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', background: 'var(--dt3-grad-accent)' }}>
-          <strong style={{ color: '#0B1220' }}>{title}</strong>
+        <header style={{ padding: '12px 16px', borderBottom: '1px solid var(--color-border)' }}>
+          <strong>{title}</strong>
         </header>
-        <div style={{ padding: 16, color: 'var(--text-secondary)' }}>
+        <div style={{ padding: 16 }}>
           {children}
         </div>
       </div>

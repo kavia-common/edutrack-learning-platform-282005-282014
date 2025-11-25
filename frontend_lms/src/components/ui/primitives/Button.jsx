@@ -4,77 +4,67 @@ import { classNames } from '../../../theme';
 // PUBLIC_INTERFACE
 export default function Button({
   children,
-  variant = 'primary', // primary | secondary | ghost
+  variant = 'primary', // primary | secondary | ghost | subtle
   size = 'md', // sm | md | lg
   disabled = false,
   as = 'button',
   className,
   ...rest
 }) {
-  /** Accessible, DigitalT3-themed button */
+  /** Accessible, token-driven button */
   const Comp = as;
-  const base = 'btn-reset';
   const sizes = {
-    sm: { padding: '10px 16px', fontSize: 14, radius: 9999 },
-    md: { padding: '12px 22px', fontSize: 16, radius: 9999 },
-    lg: { padding: '14px 28px', fontSize: 18, radius: 9999 },
+    sm: { padding: '8px 14px', fontSize: 14, radius: 8 },
+    md: { padding: '10px 16px', fontSize: 16, radius: 10 },
+    lg: { padding: '12px 20px', fontSize: 18, radius: 12 },
   }[size];
 
-  const styles = {
-    background: 'var(--dt3-grad-button)',
-    color: '#0B1220',
-    border: 'none',
-    borderRadius: sizes.radius,
+  const base = {
     padding: sizes.padding,
+    borderRadius: sizes.radius,
     fontSize: sizes.fontSize,
     fontWeight: 600,
-    transition: 'transform 150ms var(--dt3-ease-enter), filter 150ms var(--dt3-ease-enter), box-shadow 150ms var(--dt3-ease-enter)',
+    transition: 'var(--transition-theme)',
     cursor: disabled ? 'not-allowed' : 'pointer',
-    boxShadow: '0 10px 20px rgba(34,211,238,0.25)',
-    opacity: disabled ? 0.5 : 1,
-    textDecoration: 'none',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8
+    gap: 8,
+    textDecoration: 'none',
+    boxShadow: 'var(--shadow-sm)',
   };
 
-  if (variant === 'secondary') {
-    styles.background = 'transparent';
-    styles.color = 'var(--dt3-text-secondary)';
-    styles.border = '1px solid var(--dt3-border)';
-    styles.borderRadius = 12;
-    styles.boxShadow = 'none';
-  }
-  if (variant === 'ghost') {
-    styles.background = 'transparent';
-    styles.color = 'var(--dt3-link)';
-    styles.border = '1px solid transparent';
-    styles.boxShadow = 'none';
-    styles.borderRadius = 10;
-  }
+  const variants = {
+    primary: {
+      background: 'var(--btn-bg)',
+      color: 'var(--btn-fg)',
+      border: '1px solid var(--btn-border)',
+    },
+    secondary: {
+      background: 'transparent',
+      color: 'var(--text-secondary)',
+      border: '1px solid var(--border-color)',
+    },
+    ghost: {
+      background: 'transparent',
+      color: 'var(--color-primary)',
+      border: '1px solid transparent',
+    },
+    subtle: {
+      background: 'var(--card-bg)',
+      color: 'var(--card-fg)',
+      border: '1px solid var(--card-border)',
+    }
+  };
 
-  const hoverStyle = variant === 'primary'
-    ? { filter: 'brightness(1.05)', transform: 'translateY(-1px)', boxShadow: '0 10px 24px rgba(96,165,250,0.35), 0 0 18px rgba(34,211,238,0.35)' }
-    : (variant === 'secondary'
-        ? { backgroundColor: 'rgba(255,255,255,0.04)', borderColor: '#2A3346' }
-        : { color: '#AFE1FF' });
+  const style = { ...base, ...(variants[variant] || variants.primary), opacity: disabled ? 0.6 : 1 };
 
   return (
     <Comp
-      className={classNames(base, className)}
+      className={classNames(className)}
       aria-disabled={disabled || undefined}
       disabled={as === 'button' ? disabled : undefined}
-      onMouseEnter={(e) => {
-        if (disabled) return;
-        Object.assign(e.currentTarget.style, hoverStyle);
-      }}
-      onMouseLeave={(e) => {
-        if (disabled) return;
-        // reset hover styles by reapplying base inline styles
-        Object.assign(e.currentTarget.style, styles);
-      }}
-      style={styles}
+      style={style}
       {...rest}
     >
       {children}

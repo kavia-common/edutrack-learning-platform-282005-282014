@@ -1,4 +1,5 @@
 :root {
+  /* DigitalT3 Dark (default) */
   --dt3-bg-canvas: #0B0F19;
   --dt3-bg-surface: #0F1524;
   --dt3-bg-alt: #0A0E17;
@@ -28,10 +29,120 @@
   --dt3-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dt3-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --dt3-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+
+  /* Semantic tokens used across the app (map to DT3) */
+  --color-primary: var(--dt3-accent-3);
+  --color-secondary: var(--dt3-warning);
+  --color-success: var(--dt3-success);
+  --color-error: var(--dt3-danger);
+
+  --color-bg: var(--dt3-bg-canvas);
+  --color-surface: var(--dt3-bg-surface);
+  --color-surface-2: var(--dt3-bg-alt);
+
+  --color-text: var(--dt3-text-primary);
+  --color-text-muted: var(--dt3-text-secondary);
+  --color-border: var(--dt3-border);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.18);
+  --shadow-md: 0 6px 12px rgba(0,0,0,.28);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,.32);
+
+  /* Component tokens */
+  --btn-bg: var(--color-primary);
+  --btn-fg: #0B1220;
+  --btn-border: transparent;
+
+  --card-bg: var(--color-surface);
+  --card-fg: var(--color-text);
+  --card-border: var(--color-border);
+
+  --modal-backdrop: rgba(10, 14, 23, 0.7);
+  --modal-bg: var(--color-surface);
+  --modal-fg: var(--color-text);
+
+  --badge-bg: rgba(34, 211, 238, 0.10);
+  --badge-fg: var(--dt3-text-primary);
+
+  --navbar-bg: var(--color-surface);
+  --navbar-fg: var(--color-text);
+  --sidebar-bg: var(--color-surface);
+  --sidebar-fg: var(--color-text);
+
+  /* Smooth theme transitions */
+  --transition-theme: color .2s var(--dt3-ease-standard), background-color .2s var(--dt3-ease-standard), border-color .2s var(--dt3-ease-standard), box-shadow .2s var(--dt3-ease-standard);
+}
+
+/* DigitalT3 Light Mode */
+:root[data-theme="light"] {
+  --dt3-bg-canvas: #f9fafb;
+  --dt3-bg-surface: #ffffff;
+  --dt3-bg-alt: #f3f4f6;
+
+  --dt3-text-primary: #111827;
+  --dt3-text-secondary: #374151;
+  --dt3-text-tertiary: #6b7280;
+
+  --dt3-accent: #2563eb;
+  --dt3-accent-2: #3b82f6;
+  --dt3-accent-3: #22d3ee;
+
+  --dt3-link: #1d4ed8;
+
+  --dt3-success: #16a34a;
+  --dt3-warning: #f59e0b;
+  --dt3-danger: #ef4444;
+
+  --dt3-border: #e5e7eb;
+  --dt3-border-soft: #eef2f7;
+
+  --dt3-grad-hero: linear-gradient(135deg, #ffffff 0%, #f3f4f6 60%, #ffffff 100%);
+  --dt3-grad-accent: linear-gradient(135deg, #22d3ee 0%, #60a5fa 40%, #93c5fd 100%);
+  --dt3-grad-button: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  --dt3-grad-card: linear-gradient(180deg, rgba(59,130,246,0.05) 0%, rgba(34,211,238,0.05) 100%);
+
+  /* Map semantic tokens from DT3 light */
+  --color-primary: #2563eb;
+  --color-secondary: var(--dt3-warning);
+  --color-success: var(--dt3-success);
+  --color-error: var(--dt3-danger);
+
+  --color-bg: var(--dt3-bg-canvas);
+  --color-surface: var(--dt3-bg-surface);
+  --color-surface-2: var(--dt3-bg-alt);
+
+  --color-text: var(--dt3-text-primary);
+  --color-text-muted: var(--dt3-text-tertiary);
+  --color-border: var(--dt3-border);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 6px 12px rgba(0,0,0,.10);
+  --shadow-lg: 0 12px 24px rgba(0,0,0,.12);
+
+  --btn-bg: var(--color-primary);
+  --btn-fg: #ffffff;
+  --btn-border: transparent;
+
+  --card-bg: var(--color-surface);
+  --card-fg: var(--color-text);
+  --card-border: var(--color-border);
+
+  --modal-backdrop: rgba(17, 24, 39, 0.45);
+  --modal-bg: var(--color-surface);
+  --modal-fg: var(--color-text);
+
+  --badge-bg: rgba(37, 99, 235, 0.12);
+  --badge-fg: #1e3a8a;
+
+  --navbar-bg: var(--color-surface);
+  --navbar-fg: var(--color-text);
+  --sidebar-bg: var(--color-surface);
+  --sidebar-fg: var(--color-text);
 }
 
 body {
   background: var(--dt3-bg-canvas);
   color: var(--dt3-text-secondary);
   font-family: "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Liberation Sans", sans-serif;
+  transition: var(--transition-theme);
 }

@@ -1,21 +1,29 @@
 @import url('./theme/tokens.css');
 
-/* Map existing semantic variables to DigitalT3 variables to preserve current components */
+/* Keep semantic variables mapped to DigitalT3 tokens */
 :root {
-  --primary: var(--dt3-accent-3);
-  --secondary: var(--dt3-accent-2);
-  --success: var(--dt3-success);
-  --error: var(--dt3-danger);
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --success: var(--color-success);
+  --error: var(--color-error);
 
-  /* Legacy background/surface/text mapped to DT3 dark theme */
-  --bg-primary: var(--dt3-bg-canvas);
-  --bg-secondary: var(--dt3-bg-surface);
-  --surface: var(--dt3-bg-surface);
-  --text-primary: var(--dt3-text-primary);
-  --text-secondary: var(--dt3-text-secondary);
-  --border-color: var(--dt3-border);
-  --button-bg: var(--dt3-grad-button);
-  --button-text: #0B1220;
+  --bg-primary: var(--color-bg);
+  --bg-secondary: var(--color-surface);
+  --surface: var(--color-surface);
+  --text-primary: var(--color-text);
+  --text-secondary: var(--color-text-muted);
+  --border-color: var(--color-border);
+  --button-bg: var(--btn-bg);
+  --button-text: var(--btn-fg);
+}
+
+html {
+  height: 100%;
+  transition: var(--transition-theme);
+}
+
+body, #root {
+  height: 100%;
 }
 
 body {
@@ -25,12 +33,13 @@ body {
   font-family: "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Liberation Sans", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: var(--transition-theme);
 }
 
 * { box-sizing: border-box; }
 button, a { transition: background-color .15s var(--dt3-ease-standard), color .15s var(--dt3-ease-standard), box-shadow .15s var(--dt3-ease-enter), transform .15s var(--dt3-ease-enter); }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+/* Utilities */
+.border-token { border-color: var(--border-color); }
+.bg-surface { background: var(--surface); }
+.text-muted { color: var(--text-secondary); }

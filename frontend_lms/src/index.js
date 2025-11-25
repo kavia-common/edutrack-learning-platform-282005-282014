@@ -5,6 +5,10 @@ import App from './App';
 // Attach dev helpers for admin toggling (window.setAdminEmail, etc.)
 import './dev/setAdmin';
 import { getEnv } from './utils/env';
+import { initTheme } from './theme';
+
+// Initialize theme before app renders to avoid flash and honor persisted choice
+initTheme();
 
 // Surface key envs to help preview validate configuration
 // Note: CRA embeds env at build time; these are safe informational logs

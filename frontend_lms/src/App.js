@@ -8,7 +8,7 @@ import { AuthProvider } from './store/authStore';
 import { CoursesProvider } from './store/courseStore';
 import { ProgressProvider } from './store/progressStore';
 import Layout from './components/layout/Layout.jsx';
-import { applyCssVars } from './theme';
+import { applyCssVars } from './theme-compat';
 import Skeleton from './components/ui/primitives/Skeleton.jsx';
 
 const Documents = React.lazy(() => import('./routes/Documents'));

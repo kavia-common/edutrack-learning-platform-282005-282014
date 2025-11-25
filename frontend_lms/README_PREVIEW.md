@@ -1,32 +1,58 @@
-Preview notes
+# Preview
 
-- The development server runs on port 3000 by default. Override with REACT_APP_PORT.
-- The start script disables auto-opening the browser to align with preview system.
-- Required environment variables are documented in .env.example and must be set in the container's .env by the orchestrator.
-- Common run commands:
-  REACT_APP_PORT=3000 npm start
-  npm run preview
+This preview shows the LMS UI and how to navigate. Use the sidebar and top navigation to access pages.
 
-Theme
+## DigitalT3 Theme: Light/Dark Mode
 
-- DigitalT3 theme is applied across the app.
-- Global tokens are imported from assets/tokens.css via src/index.css.
-- Semantic CSS variables used by components are mapped in src/index.css and enforced via applyCssVars in src/theme.js.
-- For JS theme consumers, see assets/mui-theme.js for MUI-style options. We do not bundle MUI here, but the tokens are compatible.
-- To adjust colors/gradients/typography globally, edit assets/tokens.css. Keep semantic mappings stable (e.g., --bg-primary, --surface).
+The LMS ships with a DigitalT3 theme supporting both Light and Dark modes.
 
-Performance & UX improvements
+- Tokens are defined in `src/theme/tokens.css`
+  - Default tokens represent the dark theme under `:root`
+  - A dedicated Light Mode palette is defined under `:root[data-theme="light"]`
+- All core components read from tokens: Button, Card, Modal, Badge, Navbar, Layout
 
-- Route-based code splitting enabled with React.lazy/Suspense.
-- Skeleton placeholders for perceived performance during route loads.
-- Accessible focus states and improved button/links semantics with DT3 focus ring.
-- Images: prefer responsive sizes and compressed assets; none large in this template currently.
-- Production flags: build script disables source maps by default (set REACT_APP_ENABLE_SOURCE_MAPS=true if needed).
-- Analyzer (dev-only) to inspect bundles:
+### Runtime behavior
 
-  npm run analyze
-  # This builds with source maps, runs source-map-explorer, and emits analyzer-report.html
+- On app load, the theme initializes from `localStorage` (key: `dt3-theme`) or `prefers-color-scheme`. Default is `light`.
+- The navbar includes a toggle to switch between Light and Dark, which updates `document.documentElement.dataset.theme` and persists the choice.
+- Minimal transitions are applied via `--transition-theme` for smooth color/background changes.
 
-- If running in CI, ensure REACT_APP_ENABLE_SOURCE_MAPS=true for analyze only; keep it false for production builds.
+### Programmatic control
 
-Note: Courses/Sections navigation has been removed from the layout and top-level UI. Any prior links or side drawer content related to courses/sections are no longer visible.
+Use the helpers from `src/theme.js`:
+
+```js
+// PUBLIC_INTERFACE
+import { getTheme, setTheme, toggleTheme, initTheme } from './theme';
+
+initTheme();         // initialize on load (already called from src/index.js)
+getTheme();          // -> 'light' | 'dark'
+setTheme('light');   // set explicit theme and persist
+toggleTheme();       // toggles and persists
+```
+
+### Customization
+
+Override tokens by adjusting `src/theme/tokens.css`. For example, to tweak light card surface:
+
+```css
+:root[data-theme="light"] {
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --badge-bg: rgba(37, 99, 235, 0.10);
+}
+```
+
+All surfaces, borders, and text use the following core tokens:
+
+- Background: `--color-bg`, `--color-surface`, `--color-surface-2`
+- Text: `--color-text`, `--color-text-muted`
+- Border: `--color-border`
+- Shadows: `--shadow-sm`, `--shadow-md`, `--shadow-lg`
+
+Transitions are controlled by `--transition-theme` for a minimal, smooth theme change.
+
+### Notes
+
+- The Sidebar is currently decommissioned and returns null.
+- Environment variables are read via `src/utils/env.js` and logged on startup for validation.
