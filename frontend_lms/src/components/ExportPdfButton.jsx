@@ -31,17 +31,36 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
 
     let outcome = { success: false, blob: null, dataUrl: null, error: '' };
     try {
-      const el = targetRef?.current || (selector ? document.querySelector(selector) : null);
-      if (el) {
-        outcome = await exportElementToPdf(el, filename, {
-          returnBlob: true,
-          returnDataUrl: true,
-          skipSave: false,
-          diagnostics: DIAG,
-        });
+      if (typeof window === 'undefined' || typeof document === 'undefined') {
+        outcome = { success: false, blob: null, dataUrl: null, error: 'not-mounted' };
       } else {
-        log('No target element found for ExportPdfButton', { hasRef: !!targetRef?.current, selector });
-        outcome = { success: false, blob: null, dataUrl: null, error: selector ? 'selector-missing' : 'no-target' };
+        // Resolve element: prefer ref.current, then selector, then fallback by deterministic id in selector if provided
+        let el = targetRef?.current || null;
+        if (!el && selector && typeof selector === 'string') {
+          try { el = document.querySelector(selector); } catch { /* ignore */ }
+        }
+        // As last resort, if selector is an id without '#', try to resolve
+        if (!el && selector && typeof selector === 'string' && !selector.trim().startsWith('#')) {
+          try { el = document.getElementById(selector.trim()); } catch { /* ignore */ }
+        }
+
+        if (el instanceof HTMLElement) {
+          outcome = await exportElementToPdf(el, filename, {
+            returnBlob: true,
+            returnDataUrl: true,
+            skipSave: false,
+            diagnostics: DIAG,
+          });
+        } else {
+          const diag = {
+            hasRef: !!targetRef,
+            refCurrentType: targetRef?.current ? targetRef.current.constructor?.name : null,
+            selector,
+            docReady: document.readyState,
+          };
+          log('No target element found for ExportPdfButton', diag);
+          outcome = { success: false, blob: null, dataUrl: null, error: selector ? 'no-target-selector' : 'no-target' };
+        }
       }
     } catch (e) {
       log('Unhandled exception', e);

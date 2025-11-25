@@ -170,6 +170,7 @@ export default function OnboardingForm() {
     <h3 style={{ margin: '4px 0 8px', color: 'var(--text-primary)' }}>{text}</h3>
   );
 
+  // Container ref for PDF export target; we also provide a deterministic DOM id.
   const exportScopeRef = useRef(null);
   const titleRef = useRef(null);
   // Initialize toast; if provider not mounted, use no-op
@@ -186,7 +187,7 @@ export default function OnboardingForm() {
       <Card
         as="section"
         ref={exportScopeRef}
-        id="onboarding-form-card"
+        id="onboarding-printable"
         style={{ padding: 16, display: 'grid', gap: 14 }}
       >
         <h1 ref={titleRef} style={{ margin: 0 }}>Onboarding Form</h1>
@@ -547,6 +548,7 @@ export default function OnboardingForm() {
           <Button variant="primary" onClick={handleSubmit}>Submit</Button>
           <ExportPdfButton
             targetRef={exportScopeRef}
+            selector="#onboarding-printable"
             filename={`OnboardingForm-${(form.firstName || 'User')}-${new Date().toISOString().slice(0,10)}.pdf`}
             label="Export PDF"
             style={{

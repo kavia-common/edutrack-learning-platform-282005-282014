@@ -40,8 +40,26 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
     return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-window' } : false;
   }
   if (!element) {
-    log('No element provided.');
-    return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-element' } : false;
+    log('No element provided to exportElementToPdf. Ref/selector may be missing or not yet mounted.');
+    return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-target' } : false;
+  }
+  // Defensive: Sometimes callers pass a selector string by mistake; try to resolve
+  if (typeof element === 'string') {
+    try {
+      const viaSel = document.querySelector(element);
+      if (viaSel) element = viaSel;
+    } catch { /* ignore */ }
+  }
+  // Defensive: If element is not an HTMLElement, try to coerce by id if it's an object with id prop
+  if (!(element instanceof HTMLElement)) {
+    try {
+      const elById = element && typeof element === 'object' && element.id ? document.getElementById(String(element.id)) : null;
+      if (elById) element = elById;
+    } catch { /* ignore */ }
+  }
+  if (!(element instanceof HTMLElement)) {
+    log('Provided element is not a valid HTMLElement for export.');
+    return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'invalid-target' } : false;
   }
 
   // Allow fonts/images/layout to settle
@@ -306,11 +324,13 @@ export async function exportSelectorToPdf(selector, filename = 'page-export.pdf'
   if (typeof window === 'undefined') return false;
   if (!selector || typeof selector !== 'string') {
     console.warn('[exportSelectorToPdf] Invalid selector.');
+    if (options?.returnBlob || options?.returnDataUrl) return { success: false, error: 'invalid-selector' };
     return false;
   }
   const el = document.querySelector(selector);
   if (!el) {
     console.warn('[exportSelectorToPdf] Element not found for selector:', selector);
+    if (options?.returnBlob || options?.returnDataUrl) return { success: false, error: 'no-target-selector' };
     return false;
   }
   return exportElementToPdf(el, filename, options);
