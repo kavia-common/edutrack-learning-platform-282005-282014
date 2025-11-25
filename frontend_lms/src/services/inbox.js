@@ -67,6 +67,16 @@ export function submitDocument({ title, blob, type = 'onboarding', status = 'sub
       // ignore
     }
 
+    // Dev diagnostics
+    try {
+      const DIAG = (process.env.REACT_APP_NODE_ENV || process.env.NODE_ENV) !== 'production';
+      if (DIAG) {
+        const approxBytes = JSON.stringify(next).length;
+        // eslint-disable-next-line no-console
+        console.debug('[inbox] Saved item:', { id, title: submitted.title, urlType: typeof submitted.url, length: submitted.url?.length || 0, storageBytes: approxBytes });
+      }
+    } catch {}
+
     return submitted;
   } catch {
     return null;

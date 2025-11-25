@@ -123,6 +123,10 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
         let error = '';
         try { if (wantsBlob) blob = pdf.output('blob'); } catch { ok = false; error = 'blob-failed'; }
         try { if (wantsDataUrl) dataUrl = pdf.output('datauristring'); } catch { ok = false; error = error || 'dataurl-failed'; }
+        // Ensure a valid application/pdf prefix for dataUrl
+        if (wantsDataUrl && dataUrl && !String(dataUrl).startsWith('data:application/pdf')) {
+          try { dataUrl = pdf.output('dataurlstring'); } catch {}
+        }
         if (!options?.skipSave) { try { pdf.save(safeName); } catch { /* ignore */ } }
         return { success: ok, blob, dataUrl, error: ok ? '' : error || 'fallback-output-failed' };
       }

@@ -25,6 +25,10 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
     const DIAG = (process.env.REACT_APP_NODE_ENV || process.env.NODE_ENV) !== 'production';
     const log = (...args) => { if (DIAG) try { console.debug('[ExportPdfButton]', ...args); } catch {} };
 
+    // Visual feedback
+    let btn;
+    try { btn = document.activeElement; if (btn) btn.setAttribute('data-busy', 'true'); } catch {}
+
     let outcome = { success: false, blob: null, dataUrl: null, error: '' };
     try {
       if (targetRef?.current) {
@@ -35,7 +39,6 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
           diagnostics: DIAG,
         });
       } else if (selector) {
-        // Use selector helper but we need blob; resolve element ourselves then call base util
         const el = document.querySelector(selector);
         if (el) {
           outcome = await exportElementToPdf(el, filename, {
@@ -55,6 +58,8 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
     } catch (e) {
       log('Unhandled exception', e);
       outcome = { success: false, blob: null, dataUrl: null, error: 'exception' };
+    } finally {
+      try { if (btn) btn.removeAttribute('data-busy'); } catch {}
     }
 
     try {

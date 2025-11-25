@@ -38,6 +38,14 @@ function InlinePdfViewer({ dataUrl, title, onClose }) {
       setError('No PDF provided.');
       return () => {};
     }
+
+    // If caller passes a blob/object URL directly, use it
+    if (typeof dataUrl === 'string' && dataUrl.startsWith('blob:')) {
+      setBlobUrl(dataUrl);
+      setError('');
+      return () => {};
+    }
+
     const normalized = normalizePdfInput(dataUrl);
     if (!isPdfDataUrl(normalized)) {
       setError('Invalid PDF source. Expected application/pdf base64 data URL.');
@@ -353,8 +361,10 @@ export default function AdminInbox() {
   const onboardingRows = useMemo(() => (Array.isArray(localDocs) ? localDocs : []), [localDocs]);
 
   const handleView = (src, title) => {
-    const normalized = normalizePdfInput(src);
-    if (!isPdfDataUrl(normalized)) {
+    // Accept either data URL or blob/object URL
+    const isBlobUrl = typeof src === 'string' && src.startsWith('blob:');
+    const normalized = isBlobUrl ? src : normalizePdfInput(src);
+    if (!isBlobUrl && !isPdfDataUrl(normalized)) {
       alert('Unable to preview document. The generated PDF appears to be malformed.');
       return;
     }
