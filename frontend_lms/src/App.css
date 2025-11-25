@@ -28,10 +28,20 @@
 }
 .btn:hover {
   transform: translateY(-1px);
-  filter: brightness(1.05);
-  box-shadow: 0 10px 24px rgba(96,165,250,0.35), 0 0 18px rgba(34,211,238,0.35);
+  filter: none;
+  background: var(--btn-bg-hover);
+  box-shadow: 0 10px 24px var(--brand-primary-shadow);
 }
-.btn:active { transform: translateY(0); filter: brightness(0.98); }
+.btn:active {
+  transform: translateY(0);
+  filter: none;
+  background: var(--btn-bg-active);
+  box-shadow: 0 8px 18px var(--brand-primary-shadow);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--btn-ring);
+  outline-offset: 2px;
+}
 .btn:disabled,
 .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
 

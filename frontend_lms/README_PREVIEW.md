@@ -46,13 +46,32 @@ toggleTheme();       // toggles and persists
 
 ### Customization
 
-Override tokens by adjusting `src/theme/tokens.css`. For example, to tweak light card surface:
+Primary brand color
+- The primary color for buttons and primary accents is tokenized and set to `#43919d`.
+- Edit it in `src/theme/tokens.css`:
+  - Dark (default): update `--brand-primary`, plus `--brand-primary-hover` and `--brand-primary-active` for hover/active states. Focus ring is `--brand-primary-ring`.
+  - Light: do the same under `:root[data-theme="light"]` so both themes stay consistent.
+- Semantic tokens `--color-primary` and button tokens `--btn-bg`, `--btn-bg-hover`, `--btn-bg-active`, and `--btn-ring` are derived from these brand tokens.
+- Components (Button, Navbar utilities, etc.) consume these tokens; avoid hardcoding primary colors in components.
+
+Example override snippet:
+
+```css
+:root[data-theme="light"] {
+  --brand-primary: #0ea5e9;        /* new base */
+  --brand-primary-hover: #0b8fc9;  /* darker for hover */
+  --brand-primary-active: #0a7db1; /* darker for active */
+  --brand-primary-ring: rgba(14,165,233,0.5);
+}
+```
+
+Override other tokens by adjusting `src/theme/tokens.css`. For example, to tweak light card surface:
 
 ```css
 :root[data-theme="light"] {
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
-  --badge-bg: rgba(37, 99, 235, 0.10);
+  --badge-bg: rgba(67, 145, 157, 0.12);
 }
 ```
 

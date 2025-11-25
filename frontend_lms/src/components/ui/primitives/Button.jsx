@@ -45,6 +45,11 @@ export default function Button({
       color: 'var(--text-secondary)',
       border: '1px solid var(--border-color)',
     },
+    outline: {
+      background: 'transparent',
+      color: 'var(--color-primary)',
+      border: '1px solid var(--color-primary)',
+    },
     ghost: {
       background: 'transparent',
       color: 'var(--color-primary)',
@@ -59,12 +64,38 @@ export default function Button({
 
   const style = { ...base, ...(variants[variant] || variants.primary), opacity: disabled ? 0.6 : 1 };
 
+  // Pseudo-state handling via event styles
+  const [isHover, setIsHover] = React.useState(false);
+  const [isActive, setIsActive] = React.useState(false);
+
+  const interactiveStyle = { ...style };
+  if (!disabled && variant === 'primary') {
+    interactiveStyle.background = isActive ? 'var(--btn-bg-active)' : isHover ? 'var(--btn-bg-hover)' : style.background;
+    interactiveStyle.boxShadow = isActive
+      ? `0 0 0 2px var(--btn-ring), 0 2px 8px var(--brand-primary-shadow)`
+      : isHover
+        ? `0 0 0 2px transparent, 0 6px 16px var(--brand-primary-shadow)`
+        : 'var(--shadow-sm)';
+  }
+
+  // Shared focus ring via data attr (inline style)
+  const focusStyle = {
+    outline: '3px solid var(--btn-ring)',
+    outlineOffset: '2px'
+  };
+
   return (
     <Comp
       className={classNames(className)}
       aria-disabled={disabled || undefined}
       disabled={as === 'button' ? disabled : undefined}
-      style={style}
+      style={interactiveStyle}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => { setIsHover(false); setIsActive(false); }}
+      onMouseDown={() => setIsActive(true)}
+      onMouseUp={() => setIsActive(false)}
+      onFocus={(e) => { e.currentTarget.style.outline = focusStyle.outline; e.currentTarget.style.outlineOffset = focusStyle.outlineOffset; }}
+      onBlur={(e) => { e.currentTarget.style.outline = 'none'; e.currentTarget.style.outlineOffset = '0px'; }}
       {...rest}
     >
       {children}

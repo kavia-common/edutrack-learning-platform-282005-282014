@@ -8,6 +8,16 @@
   --dt3-text-secondary: #C7D0E0;
   --dt3-text-tertiary: #96A2B8;
 
+  /* Brand primary color and derived shades (Dark) */
+  --brand-primary: #43919d;                  /* base */
+  --brand-primary-contrast: #081217;         /* dark text/bg contrast where needed */
+  --brand-primary-foreground: #ffffff;       /* text on primary buttons in dark */
+  --brand-primary-hover: #3b808a;            /* ~10-12% darker for hover in dark */
+  --brand-primary-active: #356f78;           /* ~18-22% darker for active in dark */
+  --brand-primary-ring: rgba(67,145,157,0.55); /* focus ring color */
+  --brand-primary-shadow: rgba(67,145,157,0.35);
+
+  /* Legacy accent palette retained for non-primary accents */
   --dt3-accent: #2BD4FF;
   --dt3-accent-2: #60A5FA;
   --dt3-accent-3: #22D3EE;
@@ -23,15 +33,19 @@
 
   --dt3-grad-hero: linear-gradient(135deg, #0B0F19 0%, #0F1524 60%, #0B0F19 100%);
   --dt3-grad-accent: linear-gradient(135deg, #22D3EE 0%, #60A5FA 40%, #7DD3FC 100%);
-  --dt3-grad-button: linear-gradient(135deg, #22D3EE 0%, #60A5FA 100%);
+  --dt3-grad-button: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-hover) 100%);
   --dt3-grad-card: linear-gradient(180deg, rgba(34,211,238,0.06) 0%, rgba(96,165,250,0.06) 100%);
 
   --dt3-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
   --dt3-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --dt3-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
 
-  /* Semantic tokens used across the app (map to DT3) */
-  --color-primary: var(--dt3-accent-3);
+  /* Semantic tokens used across the app (map to brand) */
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-active: var(--brand-primary-active);
+  --color-primary-ring: var(--brand-primary-ring);
+
   --color-secondary: var(--dt3-warning);
   --color-success: var(--dt3-success);
   --color-error: var(--dt3-danger);
@@ -50,7 +64,10 @@
 
   /* Component tokens */
   --btn-bg: var(--color-primary);
-  --btn-fg: #0B1220;
+  --btn-bg-hover: var(--color-primary-hover);
+  --btn-bg-active: var(--color-primary-active);
+  --btn-ring: var(--color-primary-ring);
+  --btn-fg: var(--brand-primary-foreground);
   --btn-border: transparent;
 
   --card-bg: var(--color-surface);
@@ -61,7 +78,7 @@
   --modal-bg: var(--color-surface);
   --modal-fg: var(--color-text);
 
-  --badge-bg: rgba(34, 211, 238, 0.10);
+  --badge-bg: rgba(67, 145, 157, 0.10);
   --badge-fg: var(--dt3-text-primary);
 
   --navbar-bg: var(--color-surface);
@@ -83,9 +100,18 @@
   --dt3-text-secondary: #374151;
   --dt3-text-tertiary: #6b7280;
 
-  --dt3-accent: #2563eb;
-  --dt3-accent-2: #3b82f6;
-  --dt3-accent-3: #22d3ee;
+  /* Brand primary color and derived shades (Light) */
+  --brand-primary: #43919d;                     /* base */
+  --brand-primary-contrast: #0c1a1e;            /* ensures visible text on tints if needed */
+  --brand-primary-foreground: #ffffff;          /* text on primary buttons in light */
+  --brand-primary-hover: #3a7e88;               /* slightly darker for hover */
+  --brand-primary-active: #326c75;              /* further darker for active */
+  --brand-primary-ring: rgba(67,145,157,0.5);
+  --brand-primary-shadow: rgba(67,145,157,0.25);
+
+  --dt3-accent: #43919d; /* align accent with brand in light */
+  --dt3-accent-2: #3a7e88;
+  --dt3-accent-3: #5faab4;
 
   --dt3-link: #1d4ed8;
 
@@ -97,12 +123,16 @@
   --dt3-border-soft: #eef2f7;
 
   --dt3-grad-hero: linear-gradient(135deg, #ffffff 0%, #f3f4f6 60%, #ffffff 100%);
-  --dt3-grad-accent: linear-gradient(135deg, #22d3ee 0%, #60a5fa 40%, #93c5fd 100%);
-  --dt3-grad-button: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
-  --dt3-grad-card: linear-gradient(180deg, rgba(59,130,246,0.05) 0%, rgba(34,211,238,0.05) 100%);
+  --dt3-grad-accent: linear-gradient(135deg, #5faab4 0%, #3a7e88 40%, #43919d 100%);
+  --dt3-grad-button: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-primary-hover) 100%);
+  --dt3-grad-card: linear-gradient(180deg, rgba(67,145,157,0.05) 0%, rgba(59,130,246,0.05) 100%);
 
-  /* Map semantic tokens from DT3 light */
-  --color-primary: #2563eb;
+  /* Map semantic tokens from brand */
+  --color-primary: var(--brand-primary);
+  --color-primary-hover: var(--brand-primary-hover);
+  --color-primary-active: var(--brand-primary-active);
+  --color-primary-ring: var(--brand-primary-ring);
+
   --color-secondary: var(--dt3-warning);
   --color-success: var(--dt3-success);
   --color-error: var(--dt3-danger);
@@ -120,6 +150,9 @@
   --shadow-lg: 0 12px 24px rgba(0,0,0,.12);
 
   --btn-bg: var(--color-primary);
+  --btn-bg-hover: var(--color-primary-hover);
+  --btn-bg-active: var(--color-primary-active);
+  --btn-ring: var(--color-primary-ring);
   --btn-fg: #ffffff;
   --btn-border: transparent;
 
@@ -131,8 +164,8 @@
   --modal-bg: var(--color-surface);
   --modal-fg: var(--color-text);
 
-  --badge-bg: rgba(37, 99, 235, 0.12);
-  --badge-fg: #1e3a8a;
+  --badge-bg: rgba(67, 145, 157, 0.12);
+  --badge-fg: #0b3a42;
 
   --navbar-bg: var(--color-surface);
   --navbar-fg: var(--color-text);
