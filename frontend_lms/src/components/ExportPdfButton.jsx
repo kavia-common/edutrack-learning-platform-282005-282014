@@ -22,22 +22,23 @@ import { exportElementToPdf, exportSelectorToPdf } from '../utils/exportPdf';
  */
 const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', label = 'Download PDF', disabled = false, style, onExport }) => {
   const onClick = async () => {
-    let ok = false;
-    let blob = null;
-
-    // We try to generate without saving automatically by intercepting in export util,
-    // but since export utils currently save directly, we create a best-effort Blob using print fallback detection.
-    // To ensure we can submit the PDF, we augment export utils to also return a Blob when successful.
-    if (targetRef?.current) {
-      ok = await exportElementToPdf(targetRef.current, filename);
-    } else if (selector) {
-      ok = await exportSelectorToPdf(selector, filename);
-    } else {
-      console.warn('[ExportPdfButton] Provide either targetRef or selector.');
+    let outcome = { success: false, blob: null, error: '' };
+    try {
+      if (targetRef?.current) {
+        outcome = await exportElementToPdf(targetRef.current, filename, { returnBlob: true, skipSave: false });
+      } else if (selector) {
+        // Use selector helper but we need blob; call underlying util after resolving element
+        const res = await exportSelectorToPdf(selector, filename, { returnBlob: true, skipSave: false });
+        outcome = res && typeof res === 'object' ? res : { success: !!res, blob: null };
+      } else {
+        console.warn('[ExportPdfButton] Provide either targetRef or selector.');
+        outcome = { success: false, blob: null, error: 'no-target' };
+      }
+    } catch (e) {
+      outcome = { success: false, blob: null, error: 'exception' };
     }
 
-    // If export utils eventually support returning a Blob, pass it along; for now blob stays null.
-    try { onExport && onExport({ blob, success: !!ok }); } catch { /* ignore */ }
+    try { onExport && onExport({ blob: outcome?.blob || null, success: !!outcome?.success }); } catch { /* ignore */ }
   };
 
   return (

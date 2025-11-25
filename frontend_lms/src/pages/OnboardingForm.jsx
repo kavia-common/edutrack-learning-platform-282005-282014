@@ -530,12 +530,8 @@ export default function OnboardingForm() {
               borderRadius: 10,
               fontWeight: 600,
             }}
-            onExport={async ({ success }) => {
+            onExport={async ({ success, blob }) => {
               try {
-                // Generate PDF again but requesting a Blob for submission (skipSave to avoid duplicate save)
-                const { exportElementToPdf } = await import('../utils/exportPdf');
-                const res = await exportElementToPdf(exportScopeRef.current, `OnboardingForm-${(form.firstName || 'User')}-${new Date().toISOString().slice(0,10)}.pdf`, { returnBlob: true, skipSave: true });
-                const blob = res && res.blob ? res.blob : null;
                 const email = (() => {
                   try {
                     const raw = window.localStorage.getItem('lms_auth');
@@ -545,9 +541,9 @@ export default function OnboardingForm() {
                     return 'anonymous';
                   }
                 })();
-
                 const title = `Onboarding Form – ${(form.firstName || '').trim() || 'User'} – ${new Date().toLocaleDateString()}`;
-                if (blob) {
+
+                if (blob instanceof Blob) {
                   const saved = submitDocument({ title, blob, type: 'onboarding', status: 'submitted', submittedBy: email });
                   if (saved) {
                     push?.({ type: 'success', message: 'Onboarding PDF submitted to Admin Inbox.' });
@@ -555,8 +551,8 @@ export default function OnboardingForm() {
                     push?.({ type: 'error', message: 'Failed to submit to Admin Inbox.' });
                   }
                 } else if (success) {
-                  // Fallback: export succeeded but blob missing; inform user that only download occurred.
-                  push?.({ type: 'info', message: 'PDF downloaded. Submission unavailable in this browser.' });
+                  // Export succeeded but blob missing
+                  push?.({ type: 'info', message: 'PDF downloaded. Unable to attach to Admin Inbox in this environment.' });
                 } else {
                   push?.({ type: 'error', message: 'PDF export failed.' });
                 }

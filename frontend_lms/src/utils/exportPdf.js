@@ -13,45 +13,44 @@
 //
 /* eslint-disable no-console */
 
+/* eslint-disable no-console */
 // PUBLIC_INTERFACE
 export async function exportElementToPdf(element, filename = 'page-export.pdf', options = {}) {
   /**
    * Capture a DOM element into a multi-page A4 portrait PDF using html2canvas + jsPDF.
    * - element: HTMLElement or null
    * - filename: string, the PDF filename to save as
-   * - options: { returnBlob?: boolean, skipSave?: boolean }
-   * Returns: true on success (or { success, blob } if returnBlob), false on failure (logs warnings)
+   * - options: { returnBlob?: boolean, returnDataUrl?: boolean, skipSave?: boolean, scale?: number }
+   * Returns:
+   *   - boolean true on success when not requesting blob/dataURL
+   *   - { success: boolean, blob?: Blob, dataUrl?: string, error?: string } when returnBlob/returnDataUrl specified
    */
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-window' } : false;
   if (!element) {
-    console.warn('[exportElementToPdf] No element provided.');
-    return false;
+    const msg = '[exportElementToPdf] No element provided.';
+    console.warn(msg);
+    return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-element' } : false;
   }
 
-  // Delay slightly to allow fonts/images to settle.
-  await new Promise((r) => setTimeout(r, 120));
+  // Allow fonts/images to settle
+  await new Promise((r) => setTimeout(r, 150));
 
-  // Attempt to dynamically import libs (app may also install them locally).
+  // Dynamic import libs
   let html2canvas = null;
   let jsPDFCtor = null;
 
   try {
-    // Try local dependencies first
     const h2c = await import(/* webpackChunkName: "html2canvas" */ 'html2canvas').catch(() => null);
     if (h2c && (h2c.default || h2c)) html2canvas = h2c.default || h2c;
-  } catch {
-    // ignore
-  }
+  } catch { /* ignore */ }
   try {
     const jspdfMod = await import(/* webpackChunkName: "jspdf" */ 'jspdf').catch(() => null);
     if (jspdfMod && (jspdfMod.jsPDF || jspdfMod.default?.jsPDF)) {
       jsPDFCtor = jspdfMod.jsPDF || jspdfMod.default.jsPDF;
     }
-  } catch {
-    // ignore
-  }
+  } catch { /* ignore */ }
 
-  // If local imports failed (not installed), fall back to CDN globals.
+  // CDN fallback for environments without dependencies installed
   if (!html2canvas) {
     try {
       await import(/* webpackIgnore: true */ 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
@@ -66,21 +65,33 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
   }
 
   if (!html2canvas || !jsPDFCtor) {
-    console.warn('[exportElementToPdf] Missing libs. Falling back to window.print().');
+    const msg = '[exportElementToPdf] Missing html2canvas/jsPDF libraries.';
+    console.warn(msg);
+    if (options?.returnBlob || options?.returnDataUrl) {
+      return { success: false, error: 'missing-libs' };
+    }
     try { window.print(); } catch { /* ignore */ }
     return false;
   }
 
-  // For capture fidelity, add a temporary class to allow CSS tweaks if needed.
+  // Add temp class to allow any .print-ready overrides in CSS
   element.classList?.add?.('print-ready');
 
   try {
+    const scale = Math.max(1, Math.min(3, Number(options?.scale || 2)));
     const canvas = await html2canvas(element, {
-      scale: 2,                // crisper output
-      useCORS: true,           // allow cross-origin images if CORS-enabled
+      scale,
+      useCORS: true,
+      allowTaint: false,
       logging: false,
       backgroundColor: '#ffffff',
       windowWidth: document.documentElement.clientWidth,
+      onclone: (doc) => {
+        // Ensure images have crossOrigin to reduce tainting risk
+        doc.querySelectorAll('img').forEach((img) => {
+          try { img.setAttribute('crossorigin', 'anonymous'); } catch { /* ignore */ }
+        });
+      },
     });
 
     const imgData = canvas.toDataURL('image/png');
@@ -94,7 +105,6 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
 
-    // Fit image to page width, maintain aspect ratio
     const imgWidth = pageWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -104,7 +114,6 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight, undefined, 'FAST');
     heightLeft -= pageHeight;
 
-    // Multi-page: keep adding the same tall image, shifted upward
     while (heightLeft > 1) {
       position = heightLeft - imgHeight;
       pdf.addPage();
@@ -112,28 +121,41 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
       heightLeft -= pageHeight;
     }
 
-    // Ensure a meaningful filename
     const safeName = String(filename || 'page-export.pdf').trim() || 'page-export.pdf';
 
-    // If caller requests a Blob (for submission), return it and optionally skip saving to avoid duplicate downloads
-    if (options && options.returnBlob) {
+    const wantsBlob = !!options?.returnBlob;
+    const wantsDataUrl = !!options?.returnDataUrl;
+    if (wantsBlob || wantsDataUrl) {
       let blob = null;
+      let dataUrl = null;
+      let ok = true;
+      let error = '';
       try {
-        blob = pdf.output('blob');
-      } catch {
-        blob = null;
+        if (wantsBlob) blob = pdf.output('blob');
+      } catch (e) {
+        ok = false;
+        error = 'blob-failed';
       }
-      if (!options.skipSave) {
+      try {
+        if (wantsDataUrl) dataUrl = pdf.output('datauristring');
+      } catch (e) {
+        ok = false;
+        error = error || 'dataurl-failed';
+      }
+      if (!options?.skipSave) {
         try { pdf.save(safeName); } catch { /* ignore */ }
       }
-      return { success: true, blob };
+      return { success: ok, blob, dataUrl, error };
     }
 
-    // Default behavior: save immediately
+    // Default: save
     pdf.save(safeName);
     return true;
   } catch (e) {
     console.warn('[exportElementToPdf] Failed to generate PDF:', e);
+    if (options?.returnBlob || options?.returnDataUrl) {
+      return { success: false, error: 'exception' };
+    }
     try { window.print(); } catch { /* ignore */ }
     return false;
   } finally {
