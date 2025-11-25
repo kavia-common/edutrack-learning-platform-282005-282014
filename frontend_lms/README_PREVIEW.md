@@ -7,14 +7,19 @@ Preview notes
   REACT_APP_PORT=3000 npm start
   npm run preview
 
+Theme
+
+- DigitalT3 theme is applied across the app.
+- Global tokens are imported from assets/tokens.css via src/index.css.
+- Semantic CSS variables used by components are mapped in src/index.css and enforced via applyCssVars in src/theme.js.
+- For JS theme consumers, see assets/mui-theme.js for MUI-style options. We do not bundle MUI here, but the tokens are compatible.
+- To adjust colors/gradients/typography globally, edit assets/tokens.css. Keep semantic mappings stable (e.g., --bg-primary, --surface).
+
 Performance & UX improvements
 
-- Global Ocean Professional theme applied using CSS variables with light/dark support.
-- Layout updated: top navigation, main content, persistent footer. Courses/Sections side drawer has been removed.
 - Route-based code splitting enabled with React.lazy/Suspense.
 - Skeleton placeholders for perceived performance during route loads.
-- Accessible focus states and improved button/links semantics.
-- Memoization guidance: wrap heavy derived computations with useMemo and useCallback in components that process large lists.
+- Accessible focus states and improved button/links semantics with DT3 focus ring.
 - Images: prefer responsive sizes and compressed assets; none large in this template currently.
 - Production flags: build script disables source maps by default (set REACT_APP_ENABLE_SOURCE_MAPS=true if needed).
 - Analyzer (dev-only) to inspect bundles:

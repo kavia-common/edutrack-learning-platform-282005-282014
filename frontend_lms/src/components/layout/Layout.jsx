@@ -39,7 +39,7 @@ export default function Layout({ children }) {
           fontSize: 12,
         }}
       >
-        Ocean Professional • Primary #2563EB • Secondary #F59E0B
+        DigitalT3 Theme • Primary var(--dt3-accent-3) • Surface var(--dt3-bg-surface)
       </footer>
     </div>
   );

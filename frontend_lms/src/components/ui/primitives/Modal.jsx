@@ -21,7 +21,7 @@ export default function Modal({ open, onClose, title = 'Dialog', children }) {
       style={{
         position: 'fixed',
         inset: 0,
-        background: 'rgba(2,6,23,0.5)',
+        background: 'rgba(10,14,23,0.7)',
         display: 'grid',
         placeItems: 'center',
         zIndex: 100,
@@ -34,17 +34,18 @@ export default function Modal({ open, onClose, title = 'Dialog', children }) {
       <div
         style={{
           background: 'var(--surface)',
+          backgroundImage: 'var(--dt3-grad-card)',
           border: '1px solid var(--border-color)',
-          borderRadius: 12,
+          borderRadius: 18,
           width: 'min(640px, 96vw)',
-          boxShadow: '0 6px 24px rgba(0,0,0,0.14)',
+          boxShadow: '0 8px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)',
           overflow: 'hidden'
         }}
       >
-        <header style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', background: 'linear-gradient(90deg, rgba(37,99,235,0.08), rgba(249,250,251,0.6))' }}>
-          <strong style={{ color: 'var(--text-primary)' }}>{title}</strong>
+        <header style={{ padding: '12px 16px', borderBottom: '1px solid var(--border-color)', background: 'var(--dt3-grad-accent)' }}>
+          <strong style={{ color: '#0B1220' }}>{title}</strong>
         </header>
-        <div style={{ padding: 16 }}>
+        <div style={{ padding: 16, color: 'var(--text-secondary)' }}>
           {children}
         </div>
       </div>

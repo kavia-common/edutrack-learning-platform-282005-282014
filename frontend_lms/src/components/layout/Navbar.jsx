@@ -5,7 +5,7 @@ import { useAuth } from '../../store/authStore';
 /**
  * PUBLIC_INTERFACE
  * Navbar
- * Top navigation bar with Ocean Professional theme. Shows Admin when current user is admin
+ * Top navigation bar themed with DigitalT3. Shows Admin when current user is admin
  * via role or local override. Reflects auth state and provides links to core pages.
  */
 export default function Navbar() {
@@ -14,11 +14,11 @@ export default function Navbar() {
 
   const linkStyle = ({ isActive }) => ({
     padding: '8px 10px',
-    color: isActive ? '#111827' : 'var(--text-secondary)',
+    color: isActive ? 'var(--dt3-text-primary)' : 'var(--dt3-text-secondary)',
     textDecoration: 'none',
     borderRadius: 8,
-    background: isActive ? 'rgba(37,99,235,0.08)' : 'transparent',
-    transition: 'background 160ms ease',
+    background: isActive ? 'rgba(125,211,252,0.10)' : 'transparent',
+    transition: 'background 160ms var(--dt3-ease-standard), color 160ms var(--dt3-ease-standard)',
   });
 
   return (
@@ -28,8 +28,8 @@ export default function Navbar() {
       zIndex: 50,
       background: 'var(--bg-secondary)',
       borderBottom: '1px solid var(--border-color)',
-      boxShadow: '0 1px 0 rgba(0,0,0,0.03)',
-      backdropFilter: 'saturate(120%) blur(6px)'
+      boxShadow: '0 1px 0 rgba(0,0,0,0.25)',
+      backdropFilter: 'saturate(140%) blur(8px)'
     }}>
       <nav aria-label="Main navigation" style={{
         display: 'flex',
@@ -45,15 +45,9 @@ export default function Navbar() {
           </Link>
           <div style={{ display: 'flex', gap: 4, marginLeft: 8 }}>
             <NavLink to="/" style={linkStyle} end>Dashboard</NavLink>
-
             <NavLink to="/documents" style={linkStyle}>Documents</NavLink>
             <NavLink to="/profile" style={linkStyle}>Profile</NavLink>
-            {/* Admin link behavior:
-               - If admin: go to /admin
-               - If not admin: go to /admin/login
-            */}
             <NavLink to={isAdmin ? "/admin" : "/admin/login"} style={linkStyle}>Admin</NavLink>
-
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

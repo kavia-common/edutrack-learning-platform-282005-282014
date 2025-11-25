@@ -1,0 +1,37 @@
+:root {
+  --dt3-bg-canvas: #0B0F19;
+  --dt3-bg-surface: #0F1524;
+  --dt3-bg-alt: #0A0E17;
+
+  --dt3-text-primary: #FFFFFF;
+  --dt3-text-secondary: #C7D0E0;
+  --dt3-text-tertiary: #96A2B8;
+
+  --dt3-accent: #2BD4FF;
+  --dt3-accent-2: #60A5FA;
+  --dt3-accent-3: #22D3EE;
+
+  --dt3-link: #7DD3FC;
+
+  --dt3-success: #22C55E;
+  --dt3-warning: #F59E0B;
+  --dt3-danger: #EF4444;
+
+  --dt3-border: #1F2937;
+  --dt3-border-soft: #182033;
+
+  --dt3-grad-hero: linear-gradient(135deg, #0B0F19 0%, #0F1524 60%, #0B0F19 100%);
+  --dt3-grad-accent: linear-gradient(135deg, #22D3EE 0%, #60A5FA 40%, #7DD3FC 100%);
+  --dt3-grad-button: linear-gradient(135deg, #22D3EE 0%, #60A5FA 100%);
+  --dt3-grad-card: linear-gradient(180deg, rgba(34,211,238,0.06) 0%, rgba(96,165,250,0.06) 100%);
+
+  --dt3-ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dt3-ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+  --dt3-ease-exit: cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+body {
+  background: var(--dt3-bg-canvas);
+  color: var(--dt3-text-secondary);
+  font-family: "Helvetica Neue", Arial, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Liberation Sans", sans-serif;
+}

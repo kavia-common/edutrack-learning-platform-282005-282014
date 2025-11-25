@@ -3,10 +3,10 @@ import React from 'react';
 // PUBLIC_INTERFACE
 export default function Badge({ children, tone = 'info' }) {
   const colors = {
-    info: { bg: 'rgba(37,99,235,0.10)', border: '1px solid rgba(37,99,235,0.30)', color: 'var(--text-primary)' },
-    warn: { bg: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.40)', color: 'var(--text-primary)' },
-    success: { bg: 'rgba(16,185,129,0.10)', border: '1px solid rgba(16,185,129,0.35)', color: 'var(--text-primary)' },
-    error: { bg: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.35)', color: 'var(--text-primary)' },
+    info: { bg: 'rgba(34,211,238,0.10)', border: '1px solid rgba(34,211,238,0.35)', color: 'var(--dt3-text-primary)' },
+    warn: { bg: 'rgba(245,158,11,0.10)', border: '1px solid rgba(245,158,11,0.40)', color: 'var(--dt3-text-primary)' },
+    success: { bg: 'rgba(34,197,94,0.10)', border: '1px solid rgba(34,197,94,0.35)', color: 'var(--dt3-text-primary)' },
+    error: { bg: 'rgba(239,68,68,0.10)', border: '1px solid rgba(239,68,68,0.35)', color: 'var(--dt3-text-primary)' },
   }[tone] || {};
   return (
     <span style={{
