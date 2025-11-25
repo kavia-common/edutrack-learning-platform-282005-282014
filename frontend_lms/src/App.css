@@ -76,9 +76,9 @@
   color: var(--text-primary);
 }
 
-/* Accessibility focus outline (tokenized) */
+/* Accessibility focus outline */
 :focus-visible {
-  outline: 3px solid var(--focus-ring);
+  outline: 3px solid rgba(34,211,238,.5);
   outline-offset: 2px;
 }
 

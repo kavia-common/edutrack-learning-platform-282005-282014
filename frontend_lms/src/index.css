@@ -42,32 +42,6 @@ body {
 * { box-sizing: border-box; }
 button, a { transition: background-color .15s var(--dt3-ease-standard), color .15s var(--dt3-ease-standard), box-shadow .15s var(--dt3-ease-enter), transform .15s var(--dt3-ease-enter); }
 
-/* Tokenized link styles */
-a {
-  color: var(--link);
-  text-decoration-color: color-mix(in oklab, var(--link) 35%, transparent);
-  text-underline-offset: 2px;
-  text-decoration-thickness: 1.5px;
-}
-a:hover {
-  color: var(--link-hover);
-  text-decoration-color: var(--link-hover);
-}
-a:visited {
-  color: var(--link-visited);
-}
-a:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-  text-decoration: underline;
-}
-
-/* Global focus-visible for interactive elements */
-:where(button,[role="button"],a,input,select,textarea):focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
 /* Utilities */
 .border-token { border-color: var(--border-color); }
 .bg-surface { background: var(--surface); }

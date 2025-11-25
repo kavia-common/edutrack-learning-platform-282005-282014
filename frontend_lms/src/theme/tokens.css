@@ -22,24 +22,7 @@
   --dt3-accent-2: #60A5FA;
   --dt3-accent-3: #22D3EE;
 
-  /* Link semantic tokens map to brand primary */
-  --link: var(--brand-primary);
-  --link-hover: var(--brand-primary-hover);
-  --link-visited: var(--brand-primary-active);
-
-  /* Focus ring token (global for interactive elements) */
-  --focus-ring: var(--brand-primary-ring);
-
-  /* Badge semantic tokens (primary/info/success) */
-  --badge-primary-bg: rgba(67,145,157,0.20);
-  --badge-primary-fg: #ffffff;
-  --badge-info-bg: rgba(67,145,157,0.18);
-  --badge-info-fg: #ffffff;
-  --badge-success-bg: rgba(34,197,94,0.18);
-  --badge-success-fg: #0b3a42;
-
-  /* Deprecated: retained for backward compatibility, prefer --link */
-  --dt3-link: var(--link);
+  --dt3-link: #7DD3FC;
 
   --dt3-success: #22C55E;
   --dt3-warning: #F59E0B;
@@ -131,24 +114,7 @@
   --dt3-accent-2: #3a7e88;
   --dt3-accent-3: #5faab4;
 
-  /* Link semantic tokens map to brand primary in light */
-  --link: var(--brand-primary);
-  --link-hover: var(--brand-primary-hover);
-  --link-visited: var(--brand-primary-active);
-
-  /* Focus ring token (global) */
-  --focus-ring: var(--brand-primary-ring);
-
-  /* Badge semantic tokens (primary/info/success) */
-  --badge-primary-bg: rgba(67,145,157,0.16);
-  --badge-primary-fg: #0b3a42; /* dark teal text for AA on light tinted bg */
-  --badge-info-bg: rgba(67,145,157,0.14);
-  --badge-info-fg: #0b3a42;
-  --badge-success-bg: rgba(22,163,74,0.14);
-  --badge-success-fg: #064e3b;
-
-  /* Deprecated: retained for backward compatibility, prefer --link */
-  --dt3-link: var(--link);
+  --dt3-link: #1d4ed8;
 
   --dt3-success: #16a34a;
   --dt3-warning: #f59e0b;
