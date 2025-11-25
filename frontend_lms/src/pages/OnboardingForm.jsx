@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import Card from '../components/ui/primitives/Card';
 import Button from '../components/ui/primitives/Button';
 import Modal from '../components/ui/primitives/Modal';
+import ExportPdfButton from '../components/ExportPdfButton.jsx';
 
 /**
  * PUBLIC_INTERFACE
@@ -139,10 +140,18 @@ export default function OnboardingForm() {
     <h3 style={{ margin: '4px 0 8px', color: 'var(--text-primary)' }}>{text}</h3>
   );
 
+  const exportScopeRef = useRef(null);
+  const titleRef = useRef(null);
+
   return (
     <main style={{ padding: 12 }}>
-      <Card as="section" style={{ padding: 16, display: 'grid', gap: 14 }}>
-        <h1 style={{ margin: 0 }}>Onboarding Form</h1>
+      <Card
+        as="section"
+        ref={exportScopeRef}
+        id="onboarding-form-card"
+        style={{ padding: 16, display: 'grid', gap: 14 }}
+      >
+        <h1 ref={titleRef} style={{ margin: 0 }}>Onboarding Form</h1>
         <p className="text-muted" style={{ marginTop: -6 }}>
           Please fill the details below. Fields marked with an asterisk (*) are required.
         </p>
@@ -495,9 +504,23 @@ export default function OnboardingForm() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 8 }}>
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', flexWrap: 'wrap', marginTop: 8 }}>
           <Button variant="subtle" onClick={() => setForm(initialState)}>Reset</Button>
           <Button variant="primary" onClick={handleSubmit}>Submit</Button>
+          <ExportPdfButton
+            targetRef={exportScopeRef}
+            filename={`OnboardingForm-${(form.firstName || 'User')}-${new Date().toISOString().slice(0,10)}.pdf`}
+            label="Export PDF"
+            style={{
+              background: 'var(--btn-bg)',
+              color: 'var(--btn-fg)',
+              border: '1px solid var(--btn-border)',
+              minWidth: 140,
+              padding: '10px 16px',
+              borderRadius: 10,
+              fontWeight: 600,
+            }}
+          />
         </div>
       </Card>
 
