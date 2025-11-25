@@ -13,7 +13,7 @@
   --text-primary: var(--color-text);
   --text-secondary: var(--color-text-muted);
   --border-color: var(--color-border);
-  --button-bg: var(--btn-bg);
+  --button-bg: var(--btn-bg);         /* brand primary */
   --button-bg-hover: var(--btn-bg-hover);
   --button-bg-active: var(--btn-bg-active);
   --button-ring: var(--btn-ring);

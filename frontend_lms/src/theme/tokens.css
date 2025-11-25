@@ -63,11 +63,12 @@
   --shadow-lg: 0 12px 24px rgba(0,0,0,.32);
 
   /* Component tokens */
+  /* Button tokens unified to brand primary (#43919d) */
   --btn-bg: var(--color-primary);
   --btn-bg-hover: var(--color-primary-hover);
   --btn-bg-active: var(--color-primary-active);
   --btn-ring: var(--color-primary-ring);
-  --btn-fg: var(--brand-primary-foreground);
+  --btn-fg: var(--brand-primary-foreground); /* white on brand for AA contrast */
   --btn-border: transparent;
 
   --card-bg: var(--color-surface);
@@ -149,11 +150,12 @@
   --shadow-md: 0 6px 12px rgba(0,0,0,.10);
   --shadow-lg: 0 12px 24px rgba(0,0,0,.12);
 
+  /* Button tokens unified to brand primary (#43919d) */
   --btn-bg: var(--color-primary);
   --btn-bg-hover: var(--color-primary-hover);
   --btn-bg-active: var(--color-primary-active);
   --btn-ring: var(--color-primary-ring);
-  --btn-fg: #ffffff;
+  --btn-fg: #ffffff; /* AA contrast on primary */
   --btn-border: transparent;
 
   --card-bg: var(--color-surface);

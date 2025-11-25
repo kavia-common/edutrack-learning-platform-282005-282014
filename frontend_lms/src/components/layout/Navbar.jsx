@@ -116,12 +116,12 @@ export default function Navbar() {
           {user ? (
             <>
               <span style={{ color: 'var(--text-secondary)', fontSize: 13 }}>{user.email}</span>
-              <Link className="btn" to="/logout" style={{ textDecoration: 'none' }}>Logout</Link>
+              <Link className="btn" to="/logout">Logout</Link>
             </>
           ) : (
             <>
-              <Link className="btn" to="/login" style={{ textDecoration: 'none' }}>Login</Link>
-              <Link className="btn" to="/register" style={{ textDecoration: 'none' }}>Register</Link>
+              <Link className="btn" to="/login">Login</Link>
+              <Link className="btn" to="/register">Register</Link>
             </>
           )}
         </div>

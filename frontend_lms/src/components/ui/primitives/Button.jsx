@@ -1,10 +1,15 @@
 import React from 'react';
 import { classNames } from '../../../theme';
 
-// PUBLIC_INTERFACE
+/**
+ * PUBLIC_INTERFACE
+ * Button
+ * Semantic button component with variants using tokenized brand colors.
+ * Variants: primary (default), outline, ghost, link, subtle, view, continue
+ */
 export default function Button({
   children,
-  variant = 'primary', // primary | secondary | ghost | subtle
+  variant = 'primary', // primary | outline | ghost | link | subtle | view | continue
   size = 'md', // sm | md | lg
   disabled = false,
   as = 'button',
@@ -34,16 +39,12 @@ export default function Button({
     boxShadow: 'var(--shadow-sm)',
   };
 
+  // All variants reference primary tokens; only semantics differ in fill/outline/link
   const variants = {
     primary: {
       background: 'var(--btn-bg)',
       color: 'var(--btn-fg)',
       border: '1px solid var(--btn-border)',
-    },
-    secondary: {
-      background: 'transparent',
-      color: 'var(--text-secondary)',
-      border: '1px solid var(--border-color)',
     },
     outline: {
       background: 'transparent',
@@ -55,30 +56,64 @@ export default function Button({
       color: 'var(--color-primary)',
       border: '1px solid transparent',
     },
+    link: {
+      background: 'transparent',
+      color: 'var(--color-primary)',
+      border: '1px solid transparent',
+      textDecoration: 'underline',
+      padding: 0,
+      boxShadow: 'none',
+      fontWeight: 600,
+    },
     subtle: {
       background: 'var(--card-bg)',
-      color: 'var(--card-fg)',
+      color: 'var(--color-primary)',
       border: '1px solid var(--card-border)',
+    },
+    // Aliases that should use brand primary
+    view: {
+      background: 'var(--btn-bg)',
+      color: 'var(--btn-fg)',
+      border: '1px solid var(--btn-border)',
+    },
+    continue: {
+      background: 'var(--btn-bg)',
+      color: 'var(--btn-fg)',
+      border: '1px solid var(--btn-border)',
     }
   };
 
-  const style = { ...base, ...(variants[variant] || variants.primary), opacity: disabled ? 0.6 : 1 };
+  const baseStyle = { ...base, ...(variants[variant] || variants.primary), opacity: disabled ? 0.6 : 1 };
 
-  // Pseudo-state handling via event styles
+  // Pseudo-state handling via inline event styles
   const [isHover, setIsHover] = React.useState(false);
   const [isActive, setIsActive] = React.useState(false);
 
-  const interactiveStyle = { ...style };
-  if (!disabled && variant === 'primary') {
-    interactiveStyle.background = isActive ? 'var(--btn-bg-active)' : isHover ? 'var(--btn-bg-hover)' : style.background;
+  const interactiveStyle = { ...baseStyle };
+
+  // Shared hover/active behavior based on variant family
+  const filledLike = ['primary', 'view', 'continue'];
+  const outlineLike = ['outline', 'subtle', 'ghost'];
+  const linkLike = ['link'];
+
+  if (!disabled && filledLike.includes(variant)) {
+    interactiveStyle.background = isActive ? 'var(--btn-bg-active)' : isHover ? 'var(--btn-bg-hover)' : baseStyle.background;
     interactiveStyle.boxShadow = isActive
       ? `0 0 0 2px var(--btn-ring), 0 2px 8px var(--brand-primary-shadow)`
       : isHover
         ? `0 0 0 2px transparent, 0 6px 16px var(--brand-primary-shadow)`
         : 'var(--shadow-sm)';
+  } else if (!disabled && outlineLike.includes(variant)) {
+    // keep transparent bg, but darken border/text on hover/active using tokens
+    interactiveStyle.color = isActive ? 'var(--color-primary-active)' : isHover ? 'var(--color-primary-hover)' : baseStyle.color;
+    interactiveStyle.border = `1px solid ${isActive ? 'var(--color-primary-active)' : isHover ? 'var(--color-primary-hover)' : 'var(--color-primary)'}`;
+    interactiveStyle.boxShadow = isActive ? `0 0 0 2px var(--btn-ring)` : 'var(--shadow-sm)';
+  } else if (!disabled && linkLike.includes(variant)) {
+    interactiveStyle.color = isActive ? 'var(--color-primary-active)' : isHover ? 'var(--color-primary-hover)' : baseStyle.color;
+    interactiveStyle.textDecoration = isHover || isActive ? 'underline' : 'underline';
   }
 
-  // Shared focus ring via data attr (inline style)
+  // Shared focus ring
   const focusStyle = {
     outline: '3px solid var(--btn-ring)',
     outlineOffset: '2px'

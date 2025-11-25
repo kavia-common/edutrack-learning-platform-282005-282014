@@ -157,7 +157,7 @@ export default function AdminLogin() {
         </div>
 
         <div style={{ marginTop: 12 }}>
-          <Link to="/" className="btn" style={{ textDecoration: 'none' }}>
+          <Link to="/" className="btn">
             Back to Home
           </Link>
         </div>

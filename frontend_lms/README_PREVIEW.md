@@ -23,6 +23,7 @@ The LMS ships with a DigitalT3 theme supporting both Light and Dark modes.
   - Default tokens represent the dark theme under `:root`
   - A dedicated Light Mode palette is defined under `:root[data-theme="light"]`
 - All core components read from tokens: Button, Card, Modal, Badge, Navbar, Layout
+- Buttons (including primary, outline, ghost/link, view, continue) are unified under the brand primary color (#43919d). Global utility class `.btn` and the `Button` primitive both derive styles from button tokens (`--btn-*`).
 
 ### Runtime behavior
 
@@ -83,6 +84,10 @@ All surfaces, borders, and text use the following core tokens:
 - Shadows: `--shadow-sm`, `--shadow-md`, `--shadow-lg`
 
 Transitions are controlled by `--transition-theme` for a minimal, smooth theme change.
+
+### Accessibility and Contrast
+
+- Brand button foreground is white on #43919d and meets WCAG AA contrast in light and dark modes. If you change `--brand-primary`, ensure `--btn-fg` maintains at least 4.5:1 contrast for normal text and 3:1 for large text. Tools such as the W3C contrast checker can help validate.
 
 ### Notes
 

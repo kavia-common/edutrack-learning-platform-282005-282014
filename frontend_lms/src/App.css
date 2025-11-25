@@ -9,7 +9,7 @@
   transition: background-color 0.3s var(--dt3-ease-standard), color 0.3s var(--dt3-ease-standard);
 }
 
-/* Buttons (semantic .btn used across app -> map to DT3 CTA) */
+/* Buttons (semantic .btn used across app -> map to brand primary) */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -18,24 +18,26 @@
   font-weight: 600;
   font-size: 16px;
   color: var(--button-text);
-  background: var(--button-bg);
-  border: none;
+  background: var(--button-bg); /* -> --brand-primary */
+  border: 1px solid var(--btn-border);
   border-radius: 9999px;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(34,211,238,0.25);
-  transition: transform 150ms var(--dt3-ease-enter), filter 150ms var(--dt3-ease-enter), box-shadow 150ms var(--dt3-ease-enter);
+  box-shadow: 0 10px 20px var(--brand-primary-shadow);
+  transition: transform 150ms var(--dt3-ease-enter), filter 150ms var(--dt3-ease-enter), box-shadow 150ms var(--dt3-ease-enter), background-color 150ms var(--dt3-ease-enter), border-color 150ms var(--dt3-ease-enter);
   text-decoration: none;
 }
 .btn:hover {
   transform: translateY(-1px);
   filter: none;
   background: var(--btn-bg-hover);
+  border-color: var(--btn-bg-hover);
   box-shadow: 0 10px 24px var(--brand-primary-shadow);
 }
 .btn:active {
   transform: translateY(0);
   filter: none;
   background: var(--btn-bg-active);
+  border-color: var(--btn-bg-active);
   box-shadow: 0 8px 18px var(--brand-primary-shadow);
 }
 .btn:focus-visible {

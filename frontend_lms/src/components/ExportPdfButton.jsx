@@ -40,8 +40,10 @@ const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', la
       aria-label={label}
       title={label}
       style={{
-        background: disabled ? '#93C5FD' : 'var(--secondary)',
-        color: '#111827',
+        // Derive from unified button tokens; keep width customizable via style prop
+        background: disabled ? 'var(--button-bg)' : 'var(--button-bg)',
+        color: 'var(--button-text)',
+        border: '1px solid var(--btn-border)',
         minWidth: 140,
         ...(style || {}),
       }}
