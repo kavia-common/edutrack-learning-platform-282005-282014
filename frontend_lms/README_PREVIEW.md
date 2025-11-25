@@ -10,7 +10,7 @@ Preview notes
 Performance & UX improvements
 
 - Global Ocean Professional theme applied using CSS variables with light/dark support.
-- Layout updated: top navigation, side drawer (courses/sections), main content, persistent footer.
+- Layout updated: top navigation, main content, persistent footer. Courses/Sections side drawer has been removed.
 - Route-based code splitting enabled with React.lazy/Suspense.
 - Skeleton placeholders for perceived performance during route loads.
 - Accessible focus states and improved button/links semantics.
@@ -23,3 +23,5 @@ Performance & UX improvements
   # This builds with source maps, runs source-map-explorer, and emits analyzer-report.html
 
 - If running in CI, ensure REACT_APP_ENABLE_SOURCE_MAPS=true for analyze only; keep it false for production builds.
+
+Note: Courses/Sections navigation has been removed from the layout and top-level UI. Any prior links or side drawer content related to courses/sections are no longer visible.
