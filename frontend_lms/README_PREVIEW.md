@@ -1,6 +1,6 @@
 # Preview
 
-This preview shows the LMS UI and how to navigate. Use the sidebar and top navigation to access pages.
+This preview shows the Onboarding LMS UI and how to navigate. Use the sidebar and top navigation to access pages.
 
 ## Logo
 

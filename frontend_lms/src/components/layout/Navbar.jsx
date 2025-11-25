@@ -52,14 +52,14 @@ export default function Navbar() {
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', minWidth: 0 }}>
           <Link
             to="/"
-            aria-label="EduTrack LMS Home"
+            aria-label="Onboarding LMS Home"
             style={{ display: 'inline-flex', alignItems: 'center', textDecoration: 'none', gap: 10 }}
           >
             <img
               className="nav-logo"
               src="/assets/logo.png"
               srcSet="/assets/20251125_131718_image.png 2x"
-              alt="EduTrack LMS Logo"
+              alt="Onboarding LMS Logo"
               style={{
                 width: 'auto',
                 objectFit: 'contain',
@@ -75,7 +75,7 @@ export default function Navbar() {
                 whiteSpace: 'nowrap'
               }}
             >
-              EduTrack LMS
+              Onboarding LMS
             </span>
           </Link>
           <div
