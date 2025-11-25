@@ -22,23 +22,51 @@ import { exportElementToPdf, exportSelectorToPdf } from '../utils/exportPdf';
  */
 const ExportPdfButton = ({ targetRef, selector, filename = 'page-export.pdf', label = 'Download PDF', disabled = false, style, onExport }) => {
   const onClick = async () => {
-    let outcome = { success: false, blob: null, error: '' };
+    const DIAG = (process.env.REACT_APP_NODE_ENV || process.env.NODE_ENV) !== 'production';
+    const log = (...args) => { if (DIAG) try { console.debug('[ExportPdfButton]', ...args); } catch {} };
+
+    let outcome = { success: false, blob: null, dataUrl: null, error: '' };
     try {
       if (targetRef?.current) {
-        outcome = await exportElementToPdf(targetRef.current, filename, { returnBlob: true, skipSave: false });
+        outcome = await exportElementToPdf(targetRef.current, filename, {
+          returnBlob: true,
+          returnDataUrl: true,
+          skipSave: false,
+          diagnostics: DIAG,
+        });
       } else if (selector) {
-        // Use selector helper but we need blob; call underlying util after resolving element
-        const res = await exportSelectorToPdf(selector, filename, { returnBlob: true, skipSave: false });
-        outcome = res && typeof res === 'object' ? res : { success: !!res, blob: null };
+        // Use selector helper but we need blob; resolve element ourselves then call base util
+        const el = document.querySelector(selector);
+        if (el) {
+          outcome = await exportElementToPdf(el, filename, {
+            returnBlob: true,
+            returnDataUrl: true,
+            skipSave: false,
+            diagnostics: DIAG,
+          });
+        } else {
+          log('Selector not found', selector);
+          outcome = { success: false, blob: null, dataUrl: null, error: 'selector-missing' };
+        }
       } else {
         console.warn('[ExportPdfButton] Provide either targetRef or selector.');
-        outcome = { success: false, blob: null, error: 'no-target' };
+        outcome = { success: false, blob: null, dataUrl: null, error: 'no-target' };
       }
     } catch (e) {
-      outcome = { success: false, blob: null, error: 'exception' };
+      log('Unhandled exception', e);
+      outcome = { success: false, blob: null, dataUrl: null, error: 'exception' };
     }
 
-    try { onExport && onExport({ blob: outcome?.blob || null, success: !!outcome?.success }); } catch { /* ignore */ }
+    try {
+      onExport && onExport({
+        blob: outcome?.blob || null,
+        dataUrl: outcome?.dataUrl || null,
+        success: !!outcome?.success,
+        error: outcome?.error || '',
+      });
+    } catch (e) {
+      log('onExport callback error', e);
+    }
   };
 
   return (

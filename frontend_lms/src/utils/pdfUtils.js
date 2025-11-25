@@ -1,5 +1,6 @@
 /**
  * Utilities for handling PDF data URLs and base64 decoding robustly.
+ * These helpers are useful when Admin Inbox must accept either Blob or data URL forms.
  */
 
 // PUBLIC_INTERFACE

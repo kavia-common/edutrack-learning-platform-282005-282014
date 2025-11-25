@@ -20,20 +20,47 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
    * Capture a DOM element into a multi-page A4 portrait PDF using html2canvas + jsPDF.
    * - element: HTMLElement or null
    * - filename: string, the PDF filename to save as
-   * - options: { returnBlob?: boolean, returnDataUrl?: boolean, skipSave?: boolean, scale?: number }
+   * - options: {
+   *     returnBlob?: boolean,
+   *     returnDataUrl?: boolean,
+   *     skipSave?: boolean,
+   *     scale?: number,
+   *     diagnostics?: boolean,
+   *     skipExternalImages?: boolean
+   *   }
    * Returns:
    *   - boolean true on success when not requesting blob/dataURL
    *   - { success: boolean, blob?: Blob, dataUrl?: string, error?: string } when returnBlob/returnDataUrl specified
    */
-  if (typeof window === 'undefined') return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-window' } : false;
+  const DIAG = !!options?.diagnostics || (typeof process !== 'undefined' && (process.env.REACT_APP_NODE_ENV || process.env.NODE_ENV) !== 'production');
+
+  const log = (...args) => { if (DIAG) try { console.debug('[exportElementToPdf]', ...args); } catch { /* no-op */ } };
+
+  if (typeof window === 'undefined') {
+    return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-window' } : false;
+  }
   if (!element) {
-    const msg = '[exportElementToPdf] No element provided.';
-    console.warn(msg);
+    log('No element provided.');
     return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'no-element' } : false;
   }
 
-  // Allow fonts/images to settle
-  await new Promise((r) => setTimeout(r, 150));
+  // Allow fonts/images/layout to settle
+  await new Promise((r) => setTimeout(r, 200));
+
+  // Ensure any <img> elements are CORS-safe or skipped as requested
+  const imgs = Array.from(element.querySelectorAll ? element.querySelectorAll('img') : []);
+  imgs.forEach((img) => {
+    try {
+      // Prefer anonymous CORS to reduce tainting
+      if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
+      // If skipExternalImages is true, blank out remote sources that aren't same-origin
+      if (options?.skipExternalImages && /^https?:\/\//i.test(img.src) && !img.src.startsWith(window.location.origin)) {
+        const placeholder = document.createElement('span');
+        placeholder.textContent = '';
+        img.replaceWith(placeholder);
+      }
+    } catch { /* ignore */ }
+  });
 
   // Dynamic import libs
   let html2canvas = null;
@@ -42,36 +69,67 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
   try {
     const h2c = await import(/* webpackChunkName: "html2canvas" */ 'html2canvas').catch(() => null);
     if (h2c && (h2c.default || h2c)) html2canvas = h2c.default || h2c;
-  } catch { /* ignore */ }
+  } catch (e) { log('html2canvas import error', e); }
   try {
     const jspdfMod = await import(/* webpackChunkName: "jspdf" */ 'jspdf').catch(() => null);
     if (jspdfMod && (jspdfMod.jsPDF || jspdfMod.default?.jsPDF)) {
       jsPDFCtor = jspdfMod.jsPDF || jspdfMod.default.jsPDF;
     }
-  } catch { /* ignore */ }
+  } catch (e) { log('jspdf import error', e); }
 
   // CDN fallback for environments without dependencies installed
   if (!html2canvas) {
     try {
       await import(/* webpackIgnore: true */ 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js');
       html2canvas = window.html2canvas || null;
-    } catch { /* ignore */ }
+      log('Loaded html2canvas via CDN');
+    } catch (e) { log('CDN html2canvas load error', e); }
   }
   if (!jsPDFCtor) {
     try {
       await import(/* webpackIgnore: true */ 'https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js');
       jsPDFCtor = window.jspdf ? (window.jspdf.jsPDF || window.jspdf?.default?.jsPDF) : null;
-    } catch { /* ignore */ }
+      log('Loaded jsPDF via CDN');
+    } catch (e) { log('CDN jsPDF load error', e); }
   }
 
-  if (!html2canvas || !jsPDFCtor) {
-    const msg = '[exportElementToPdf] Missing html2canvas/jsPDF libraries.';
-    console.warn(msg);
-    if (options?.returnBlob || options?.returnDataUrl) {
-      return { success: false, error: 'missing-libs' };
+  const buildTextFallback = () => {
+    try {
+      if (!jsPDFCtor) return null;
+      const pdf = new jsPDFCtor({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      pdf.setFontSize(14);
+      pdf.text('Onboarding Form Export', 14, 20);
+      pdf.setFontSize(11);
+      const when = new Date().toLocaleString();
+      pdf.text(`Generated at: ${when}`, 14, 30);
+      pdf.text('Rendering fallback used (canvas export failed).', 14, 40);
+      return pdf;
+    } catch {
+      return null;
     }
-    try { window.print(); } catch { /* ignore */ }
-    return false;
+  };
+
+  if (!html2canvas || !jsPDFCtor) {
+    log('Missing libraries, using text-only fallback.');
+    const pdf = buildTextFallback();
+    if (pdf) {
+      const safeName = String(filename || 'page-export.pdf').trim() || 'page-export.pdf';
+      const wantsBlob = !!options?.returnBlob;
+      const wantsDataUrl = !!options?.returnDataUrl;
+      if (wantsBlob || wantsDataUrl) {
+        let blob = null;
+        let dataUrl = null;
+        let ok = true;
+        let error = '';
+        try { if (wantsBlob) blob = pdf.output('blob'); } catch { ok = false; error = 'blob-failed'; }
+        try { if (wantsDataUrl) dataUrl = pdf.output('datauristring'); } catch { ok = false; error = error || 'dataurl-failed'; }
+        if (!options?.skipSave) { try { pdf.save(safeName); } catch { /* ignore */ } }
+        return { success: ok, blob, dataUrl, error: ok ? '' : error || 'fallback-output-failed' };
+      }
+      try { pdf.save(safeName); } catch { /* ignore */ }
+      return true;
+    }
+    return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'missing-libs' } : false;
   }
 
   // Add temp class to allow any .print-ready overrides in CSS
@@ -85,16 +143,67 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
       allowTaint: false,
       logging: false,
       backgroundColor: '#ffffff',
+      imageTimeout: 5000,
+      removeContainer: true,
       windowWidth: document.documentElement.clientWidth,
       onclone: (doc) => {
-        // Ensure images have crossOrigin to reduce tainting risk
         doc.querySelectorAll('img').forEach((img) => {
-          try { img.setAttribute('crossorigin', 'anonymous'); } catch { /* ignore */ }
+          try {
+            if (!img.getAttribute('crossorigin')) img.setAttribute('crossorigin', 'anonymous');
+            if (options?.skipExternalImages && /^https?:\/\//i.test(img.src) && !img.src.startsWith(window.location.origin)) {
+              const placeholder = doc.createElement('span');
+              placeholder.textContent = '';
+              img.replaceWith(placeholder);
+            }
+          } catch { /* ignore */ }
         });
       },
     });
 
-    const imgData = canvas.toDataURL('image/png');
+    let imgData = '';
+    try {
+      imgData = canvas.toDataURL('image/png');
+    } catch (e) {
+      log('canvas toDataURL failed, trying toBlob path', e);
+      // Some environments restrict toDataURL; try toBlob -> dataURL
+      imgData = await new Promise((resolve) => {
+        try {
+          canvas.toBlob((blob) => {
+            if (!blob) return resolve('');
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result || ''));
+            reader.onerror = () => resolve('');
+            reader.readAsDataURL(blob);
+          }, 'image/png');
+        } catch {
+          resolve('');
+        }
+      });
+    }
+
+    if (!imgData) {
+      log('No image data produced from canvas; using text-only fallback.');
+      const pdf = buildTextFallback();
+      if (pdf) {
+        const safeName = String(filename || 'page-export.pdf').trim() || 'page-export.pdf';
+        const wantsBlob = !!options?.returnBlob;
+        const wantsDataUrl = !!options?.returnDataUrl;
+        if (wantsBlob || wantsDataUrl) {
+          let blob = null;
+          let dataUrl = null;
+          let ok = true;
+          let error = '';
+          try { if (wantsBlob) blob = pdf.output('blob'); } catch { ok = false; error = 'blob-failed'; }
+          try { if (wantsDataUrl) dataUrl = pdf.output('datauristring'); } catch { ok = false; error = error || 'dataurl-failed'; }
+          if (!options?.skipSave) { try { pdf.save(safeName); } catch { /* ignore */ } }
+          return { success: ok, blob, dataUrl, error: ok ? '' : error || 'fallback-output-failed' };
+        }
+        try { pdf.save(safeName); } catch { /* ignore */ }
+        return true;
+      }
+      return options?.returnBlob || options?.returnDataUrl ? { success: false, error: 'image-data-missing' } : false;
+    }
+
     const pdf = new jsPDFCtor({
       orientation: 'portrait',
       unit: 'mm',
@@ -135,24 +244,46 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf', 
       } catch (e) {
         ok = false;
         error = 'blob-failed';
+        log('pdf output blob failed', e);
       }
       try {
         if (wantsDataUrl) dataUrl = pdf.output('datauristring');
       } catch (e) {
         ok = false;
         error = error || 'dataurl-failed';
+        log('pdf output dataurl failed', e);
       }
       if (!options?.skipSave) {
-        try { pdf.save(safeName); } catch { /* ignore */ }
+        try { pdf.save(safeName); } catch (e) { log('pdf save failed', e); }
       }
-      return { success: ok, blob, dataUrl, error };
+      return { success: ok, blob, dataUrl, error: ok ? '' : error };
     }
 
     // Default: save
-    pdf.save(safeName);
+    try { pdf.save(safeName); } catch (e) { log('pdf save failed', e); }
     return true;
   } catch (e) {
     console.warn('[exportElementToPdf] Failed to generate PDF:', e);
+    // On exception, attempt text-only fallback
+    const pdf = buildTextFallback();
+    if (pdf) {
+      const safeName = String(filename || 'page-export.pdf').trim() || 'page-export.pdf';
+      const wantsBlob = !!options?.returnBlob;
+      const wantsDataUrl = !!options?.returnDataUrl;
+      if (wantsBlob || wantsDataUrl) {
+        let blob = null;
+        let dataUrl = null;
+        let ok = true;
+        let error = '';
+        try { if (wantsBlob) blob = pdf.output('blob'); } catch { ok = false; error = 'blob-failed'; }
+        try { if (wantsDataUrl) dataUrl = pdf.output('datauristring'); } catch { ok = false; error = error || 'dataurl-failed'; }
+        if (!options?.skipSave) { try { pdf.save(safeName); } catch { /* ignore */ } }
+        return { success: ok, blob, dataUrl, error: ok ? '' : error || 'fallback-output-failed' };
+      }
+      try { pdf.save(safeName); } catch { /* ignore */ }
+      return true;
+    }
+
     if (options?.returnBlob || options?.returnDataUrl) {
       return { success: false, error: 'exception' };
     }

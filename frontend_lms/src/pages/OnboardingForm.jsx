@@ -530,7 +530,10 @@ export default function OnboardingForm() {
               borderRadius: 10,
               fontWeight: 600,
             }}
-            onExport={async ({ success, blob }) => {
+            onExport={async ({ success, blob, dataUrl, error }) => {
+              const DIAG = (process.env.REACT_APP_NODE_ENV || process.env.NODE_ENV) !== 'production';
+              const log = (...args) => { if (DIAG) try { console.debug('[OnboardingForm:onExport]', ...args); } catch {} };
+
               try {
                 const email = (() => {
                   try {
@@ -550,13 +553,21 @@ export default function OnboardingForm() {
                   } else {
                     push?.({ type: 'error', message: 'Failed to submit to Admin Inbox.' });
                   }
+                } else if (typeof dataUrl === 'string' && dataUrl.startsWith('data:application/pdf')) {
+                  const saved = submitDocument({ title, blob: dataUrl, type: 'onboarding', status: 'submitted', submittedBy: email });
+                  if (saved) {
+                    push?.({ type: 'success', message: 'Onboarding PDF (data URL) submitted to Admin Inbox.' });
+                  } else {
+                    push?.({ type: 'error', message: 'Failed to submit data URL to Admin Inbox.' });
+                  }
                 } else if (success) {
-                  // Export succeeded but blob missing
-                  push?.({ type: 'info', message: 'PDF downloaded. Unable to attach to Admin Inbox in this environment.' });
+                  push?.({ type: 'info', message: 'PDF downloaded but could not be attached to Admin Inbox.' });
                 } else {
-                  push?.({ type: 'error', message: 'PDF export failed.' });
+                  push?.({ type: 'error', message: `PDF export failed${error ? ` (${error})` : ''}.` });
+                  log('Export failed details:', { success, error });
                 }
               } catch (e) {
+                log('Unexpected error while submitting PDF', e);
                 push?.({ type: 'error', message: 'Unexpected error while submitting PDF.' });
               }
             }}
