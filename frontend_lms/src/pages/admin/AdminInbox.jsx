@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import AdminGate from '../../components/AdminGate.jsx';
 import { getInboxItems, subscribe } from '../../utils/adminInbox';
+import { listInbox as listOnboardingDocs, subscribeInbox as subscribeOnboardingDocs } from '../../services/inbox';
 import { isPdfDataUrl, normalizePdfInput, base64PdfToBlobUrl } from '../../utils/pdfUtils';
 
 // Ocean Professional palette
@@ -337,14 +338,19 @@ export default function AdminInbox() {
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerTitle, setViewerTitle] = useState('');
   const [viewerSrc, setViewerSrc] = useState('');
+  const [localDocs, setLocalDocs] = useState(() => listOnboardingDocs());
 
   useEffect(() => {
-    const unsub = subscribe((next) => setItems(next));
+    const unsub1 = subscribe((next) => setItems(next));
+    const unsub2 = subscribeOnboardingDocs((next) => setLocalDocs(next));
+    // initialize
     setItems(getInboxItems());
-    return () => unsub();
+    setLocalDocs(listOnboardingDocs());
+    return () => { unsub1 && unsub1(); unsub2 && unsub2(); };
   }, []);
 
   const rows = useMemo(() => (Array.isArray(items) ? items.slice().reverse() : []), [items]);
+  const onboardingRows = useMemo(() => (Array.isArray(localDocs) ? localDocs : []), [localDocs]);
 
   const handleView = (src, title) => {
     const normalized = normalizePdfInput(src);
@@ -419,60 +425,116 @@ export default function AdminInbox() {
             Submissions arrive here when a user clicks Continue on the Documents page.
           </p>
 
-          {rows.length === 0 ? (
-            <div
-              style={{
-                marginTop: 8,
-                background: '#f3f4f6',
-                color: '#374151',
-                border: '1px solid #e5e7eb',
-                borderRadius: 10,
-                padding: 16,
-                textAlign: 'center',
-              }}
-            >
-              No submissions yet.
-            </div>
-          ) : (
-            <div style={{ overflowX: 'auto', marginTop: 8 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }} aria-label="Admin inbox table">
-                <thead>
-                  <tr style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>
-                    <th style={{ padding: 8 }}>Email</th>
-                    <th style={{ padding: 8 }}>Submitted</th>
-                    <th style={{ padding: 8 }}>Code of Conduct</th>
-                    <th style={{ padding: 8 }}>NDA</th>
-                    <th style={{ padding: 8 }}>Offer Letter</th>
-                    <th style={{ padding: 8 }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.map((r, idx) => {
-                    const email = r?.email || 'anonymous';
-                    const cocUrl = normalizePdfInput(r?.codeOfConductPdf);
-                    const ndaUrl = normalizePdfInput(r?.ndaPdf);
-                    const offerUrl = normalizePdfInput(r?.offerLetterPdf);
-                    return (
-                      <tr key={`row-${idx}`} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                        <td style={{ padding: 8 }}>{email}</td>
-                        <td style={{ padding: 8 }}>{r?.submittedAt || '—'}</td>
-                        <td style={{ padding: 8 }}><OceanTag ok={!!r?.codeOfConduct} /></td>
-                        <td style={{ padding: 8 }}><OceanTag ok={!!r?.nda} /></td>
-                        <td style={{ padding: 8 }}><OceanTag ok={!!r?.offerLetter} /></td>
-                        <td style={{ padding: 8 }}>
-                          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-                            <ActionButtons label="Code of Conduct" dataUrl={cocUrl} onView={(src)=> handleView(src, `Code of Conduct — ${email}`)} />
-                            <ActionButtons label="NDA" dataUrl={ndaUrl} onView={(src)=> handleView(src, `NDA — ${email}`)} />
-                            <ActionButtons label="Offer Letter" dataUrl={offerUrl} onView={(src)=> handleView(src, `Offer Letter — ${email}`)} />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {/* Legacy submissions (Documents flow) */}
+          <div style={{ overflowX: 'auto', marginTop: 8 }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }} aria-label="Admin inbox table">
+              <thead>
+                <tr style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>
+                  <th style={{ padding: 8 }}>Email</th>
+                  <th style={{ padding: 8 }}>Submitted</th>
+                  <th style={{ padding: 8 }}>Code of Conduct</th>
+                  <th style={{ padding: 8 }}>NDA</th>
+                  <th style={{ padding: 8 }}>Offer Letter</th>
+                  <th style={{ padding: 8 }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.length === 0 ? (
+                  <tr><td colSpan={6} style={{ padding: 12, color: '#6b7280' }}>No document submissions.</td></tr>
+                ) : rows.map((r, idx) => {
+                  const email = r?.email || 'anonymous';
+                  const cocUrl = normalizePdfInput(r?.codeOfConductPdf);
+                  const ndaUrl = normalizePdfInput(r?.ndaPdf);
+                  const offerUrl = normalizePdfInput(r?.offerLetterPdf);
+                  return (
+                    <tr key={`row-${idx}`} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <td style={{ padding: 8 }}>{email}</td>
+                      <td style={{ padding: 8 }}>{r?.submittedAt || '—'}</td>
+                      <td style={{ padding: 8 }}><OceanTag ok={!!r?.codeOfConduct} /></td>
+                      <td style={{ padding: 8 }}><OceanTag ok={!!r?.nda} /></td>
+                      <td style={{ padding: 8 }}><OceanTag ok={!!r?.offerLetter} /></td>
+                      <td style={{ padding: 8 }}>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                          <ActionButtons label="Code of Conduct" dataUrl={cocUrl} onView={(src)=> handleView(src, `Code of Conduct — ${email}`)} />
+                          <ActionButtons label="NDA" dataUrl={ndaUrl} onView={(src)=> handleView(src, `NDA — ${email}`)} />
+                          <ActionButtons label="Offer Letter" dataUrl={offerUrl} onView={(src)=> handleView(src, `Offer Letter — ${email}`)} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Onboarding Form submissions */}
+          <div style={{ overflowX: 'auto', marginTop: 16 }}>
+            <h3 style={{ margin: '12px 0', color: ocean.text }}>Onboarding Form Submissions</h3>
+            <table style={{ width: '100%', borderCollapse: 'collapse' }} aria-label="Onboarding form submissions">
+              <thead>
+                <tr style={{ textAlign: 'left', borderBottom: '1px solid #e5e7eb' }}>
+                  <th style={{ padding: 8 }}>Title</th>
+                  <th style={{ padding: 8 }}>Submitted By</th>
+                  <th style={{ padding: 8 }}>Created</th>
+                  <th style={{ padding: 8 }}>Status</th>
+                  <th style={{ padding: 8 }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {onboardingRows.length === 0 ? (
+                  <tr><td colSpan={5} style={{ padding: 12, color: '#6b7280' }}>No onboarding form submissions.</td></tr>
+                ) : onboardingRows.map((d) => {
+                  const canView = !!d.url;
+                  return (
+                    <tr key={d.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
+                      <td style={{ padding: 8 }}>{d.title}</td>
+                      <td style={{ padding: 8 }}>{d.submittedBy || 'anonymous'}</td>
+                      <td style={{ padding: 8 }}>{new Date(d.createdAt).toLocaleString()}</td>
+                      <td style={{ padding: 8 }}>
+                        <span style={{ background: '#ecfeff', color: '#0e7490', padding: '2px 8px', borderRadius: 999 }}>{d.status || 'submitted'}</span>
+                      </td>
+                      <td style={{ padding: 8 }}>
+                        <div style={{ display: 'inline-flex', gap: 8 }}>
+                          <button
+                            type="button"
+                            onClick={() => canView ? handleView(d.url, d.title) : null}
+                            disabled={!canView}
+                            style={{
+                              background: ocean.primary,
+                              color: '#fff',
+                              border: '1px solid #1d4ed8',
+                              padding: '6px 10px',
+                              borderRadius: 8,
+                              cursor: canView ? 'pointer' : 'not-allowed',
+                              opacity: canView ? 1 : 0.5,
+                            }}
+                            aria-label={`View ${d.title}`}
+                            title={canView ? `View ${d.title}` : 'No PDF available'}
+                          >
+                            View
+                          </button>
+                          <a
+                            href={canView ? d.url : undefined}
+                            download={(d.title || 'Onboarding').replace(/\s+/g, '_') + '.pdf'}
+                            style={{
+                              color: canView ? ocean.primary : '#9ca3af',
+                              border: '1px solid #c7d2fe',
+                              padding: '6px 10px',
+                              borderRadius: 8,
+                              textDecoration: 'none',
+                              pointerEvents: canView ? 'auto' : 'none',
+                            }}
+                          >
+                            Download
+                          </a>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </section>
 
         {/* Inline PDF viewer panel appears below the table when opened */}

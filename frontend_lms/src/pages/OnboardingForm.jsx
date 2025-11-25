@@ -3,6 +3,8 @@ import Card from '../components/ui/primitives/Card';
 import Button from '../components/ui/primitives/Button';
 import Modal from '../components/ui/primitives/Modal';
 import ExportPdfButton from '../components/ExportPdfButton.jsx';
+import { submitDocument } from '../services/inbox';
+import { useToast } from '../components/ui/Toast';
 
 /**
  * PUBLIC_INTERFACE
@@ -142,6 +144,14 @@ export default function OnboardingForm() {
 
   const exportScopeRef = useRef(null);
   const titleRef = useRef(null);
+  // Initialize toast; if provider not mounted, use no-op
+  let push = () => {};
+  try {
+    const t = useToast();
+    push = t?.push || (() => {});
+  } catch {
+    // ignore
+  }
 
   return (
     <main style={{ padding: 12 }}>
@@ -519,6 +529,40 @@ export default function OnboardingForm() {
               padding: '10px 16px',
               borderRadius: 10,
               fontWeight: 600,
+            }}
+            onExport={async ({ success }) => {
+              try {
+                // Generate PDF again but requesting a Blob for submission (skipSave to avoid duplicate save)
+                const { exportElementToPdf } = await import('../utils/exportPdf');
+                const res = await exportElementToPdf(exportScopeRef.current, `OnboardingForm-${(form.firstName || 'User')}-${new Date().toISOString().slice(0,10)}.pdf`, { returnBlob: true, skipSave: true });
+                const blob = res && res.blob ? res.blob : null;
+                const email = (() => {
+                  try {
+                    const raw = window.localStorage.getItem('lms_auth');
+                    const session = raw ? JSON.parse(raw) : null;
+                    return session?.user?.email || 'anonymous';
+                  } catch {
+                    return 'anonymous';
+                  }
+                })();
+
+                const title = `Onboarding Form – ${(form.firstName || '').trim() || 'User'} – ${new Date().toLocaleDateString()}`;
+                if (blob) {
+                  const saved = submitDocument({ title, blob, type: 'onboarding', status: 'submitted', submittedBy: email });
+                  if (saved) {
+                    push?.({ type: 'success', message: 'Onboarding PDF submitted to Admin Inbox.' });
+                  } else {
+                    push?.({ type: 'error', message: 'Failed to submit to Admin Inbox.' });
+                  }
+                } else if (success) {
+                  // Fallback: export succeeded but blob missing; inform user that only download occurred.
+                  push?.({ type: 'info', message: 'PDF downloaded. Submission unavailable in this browser.' });
+                } else {
+                  push?.({ type: 'error', message: 'PDF export failed.' });
+                }
+              } catch (e) {
+                push?.({ type: 'error', message: 'Unexpected error while submitting PDF.' });
+              }
             }}
           />
         </div>

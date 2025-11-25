@@ -25,6 +25,24 @@ To change the logo:
   - Required fields are marked with an asterisk (*).
   - Responsive grid layout; works for mobile and desktop, light/dark compatible using theme tokens.
   - On submit, data is not sent to any backend. A modal opens with a JSON preview and the data is logged to console.
+- Export PDF also submits the generated PDF to a client-side Admin Inbox, making it viewable under Admin > Inbox.
+
+### Onboarding PDF Submission Flow
+
+- Trigger: The Export PDF button on the Onboarding Form.
+- After generating the PDF, the app requests a Blob from the export utility and stores it via a local inbox service:
+  - Service: src/services/inbox.js (localStorage key: ONBOARDING_DOCS)
+  - Schema: { id, title, createdAt, submittedBy, type: 'onboarding', url, status: 'submitted' }
+- Admin view:
+  - Admin Inbox (src/pages/admin/AdminInbox.jsx) shows a new table "Onboarding Form Submissions" with View and Download options.
+  - View opens an inline PDF iframe using the stored Blob/Data URL.
+- Utilities:
+  - src/utils/exportPdf.js supports returning a Blob (options: { returnBlob: true, skipSave: true }) to avoid duplicate downloads.
+
+Backend later:
+- Replace src/services/inbox.js with an API-backed module that posts the PDF (Blob or base64) and metadata to your backend.
+- Suggested API: POST /api/inbox/documents { title, type, submitter, createdAt, file }
+- Use REACT_APP_BACKEND_URL for the base URL. If unavailable, fall back to localStorage and surface a toast message.
 
 To modify fields:
 - Edit the component in src/pages/OnboardingForm.jsx

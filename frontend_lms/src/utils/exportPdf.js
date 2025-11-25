@@ -14,12 +14,13 @@
 /* eslint-disable no-console */
 
 // PUBLIC_INTERFACE
-export async function exportElementToPdf(element, filename = 'page-export.pdf') {
+export async function exportElementToPdf(element, filename = 'page-export.pdf', options = {}) {
   /**
    * Capture a DOM element into a multi-page A4 portrait PDF using html2canvas + jsPDF.
    * - element: HTMLElement or null
    * - filename: string, the PDF filename to save as
-   * Returns: true on success, false on failure (logs warnings)
+   * - options: { returnBlob?: boolean, skipSave?: boolean }
+   * Returns: true on success (or { success, blob } if returnBlob), false on failure (logs warnings)
    */
   if (typeof window === 'undefined') return false;
   if (!element) {
@@ -113,6 +114,22 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf') 
 
     // Ensure a meaningful filename
     const safeName = String(filename || 'page-export.pdf').trim() || 'page-export.pdf';
+
+    // If caller requests a Blob (for submission), return it and optionally skip saving to avoid duplicate downloads
+    if (options && options.returnBlob) {
+      let blob = null;
+      try {
+        blob = pdf.output('blob');
+      } catch {
+        blob = null;
+      }
+      if (!options.skipSave) {
+        try { pdf.save(safeName); } catch { /* ignore */ }
+      }
+      return { success: true, blob };
+    }
+
+    // Default behavior: save immediately
     pdf.save(safeName);
     return true;
   } catch (e) {
@@ -125,7 +142,7 @@ export async function exportElementToPdf(element, filename = 'page-export.pdf') 
 }
 
 // PUBLIC_INTERFACE
-export async function exportSelectorToPdf(selector, filename = 'page-export.pdf') {
+export async function exportSelectorToPdf(selector, filename = 'page-export.pdf', options = {}) {
   /**
    * Convenience helper that resolves an element by query selector and invokes exportElementToPdf.
    */
@@ -139,5 +156,5 @@ export async function exportSelectorToPdf(selector, filename = 'page-export.pdf'
     console.warn('[exportSelectorToPdf] Element not found for selector:', selector);
     return false;
   }
-  return exportElementToPdf(el, filename);
+  return exportElementToPdf(el, filename, options);
 }
