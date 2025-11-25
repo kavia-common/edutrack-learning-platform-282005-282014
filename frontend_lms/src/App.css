@@ -17,8 +17,8 @@
   padding: 12px 22px;
   font-weight: 600;
   font-size: 16px;
-  color: var(--button-text);
-  background: var(--button-bg); /* -> --brand-primary */
+  color: var(--btn-fg);
+  background: var(--btn-bg); /* token -> #43919d via tokens.css */
   border: 1px solid var(--btn-border);
   border-radius: 9999px;
   cursor: pointer;
